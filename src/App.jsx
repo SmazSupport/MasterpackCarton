@@ -24,8 +24,8 @@ function App() {
     const loadData = async () => {
       try {
         const [configRes, skusRes] = await Promise.all([
-          fetch('/data/config.json'),
-          fetch('/data/skus.json')
+          fetch('./data/config.json'),
+          fetch('./data/skus.json')
         ]);
         
         if (!configRes.ok || !skusRes.ok) {
