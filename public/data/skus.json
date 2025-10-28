@@ -6,7 +6,8 @@
     "H": 3.0,
     "oz": 12,
     "notes": "Compressible along H",
-    "current_baseline": 50
+    "current_baseline": 50,
+    "compressible": true
   },
   {
     "sku": "KIT-BETA",
@@ -14,7 +15,28 @@
     "W": 6.0,
     "H": 4.0,
     "oz": 18,
-    "notes": "",
-    "current_baseline": null
+    "notes": "Rigid",
+    "current_baseline": 30,
+    "compressible": false
+  },
+  {
+    "sku": "KIT-GAMMA",
+    "L": 6.0,
+    "W": 4.5,
+    "H": 2.5,
+    "oz": 10,
+    "notes": "Compressible",
+    "current_baseline": 72,
+    "compressible": true
+  },
+  {
+    "sku": "KIT-DELTA",
+    "L": 8.0,
+    "W": 5.5,
+    "H": 3.5,
+    "oz": 15,
+    "notes": "Semi-rigid",
+    "current_baseline": 42,
+    "compressible": true
   }
 ]

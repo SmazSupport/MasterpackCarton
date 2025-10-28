@@ -1,7 +1,6 @@
 import { useState, useMemo, useEffect } from 'react'
 import './App.css'
-import { findBestArrangement } from './solver/innerPack'
-import { findBestPalletPattern } from './solver/palletizer'
+import { analyzeCurrentMasterpack, findOptimalMasterpack } from './solver/multiSkuOptimizer'
 import { formatDims, formatWeight } from './utils/units'
 
 function App() {
@@ -14,10 +13,8 @@ function App() {
   // State for user inputs
   const [targetPalletHeight, setTargetPalletHeight] = useState(64)
   const [unitSystem, setUnitSystem] = useState('both')
-  const [searchTerm, setSearchTerm] = useState('')
-  const [selectedSku, setSelectedSku] = useState(null)
-  const [recentSkus, setRecentSkus] = useState([])
-  const [selectedPattern, setSelectedPattern] = useState('column')
+  const [view, setView] = useState('current') // 'current' or 'optimal'
+  const [optimizing, setOptimizing] = useState(false)
   
   // Load static data on mount
   useEffect(() => {
@@ -49,44 +46,33 @@ function App() {
     loadData();
   }, []);
   
-  // Handle SKU selection
-  const handleSkuSelect = (sku) => {
-    setSelectedSku(sku)
-    setSearchTerm(sku.sku)
-    
-    // Add to recent SKUs (limit to 5)
-    if (!recentSkus.some(recent => recent.sku === sku.sku)) {
-      setRecentSkus(prev => [sku, ...prev].slice(0, 5))
-    }
-  }
+  // Analyze current masterpack
+  const currentAnalysis = useMemo(() => {
+    if (!config || !skus.length) return null;
+    return analyzeCurrentMasterpack(skus, config);
+  }, [config, skus]);
   
-  // Filter SKUs based on search term
-  const filteredSkus = useMemo(() => {
-    if (!searchTerm) return [];
-    const term = searchTerm.toLowerCase();
-    return skus
-      .filter(sku => sku.sku.toLowerCase().includes(term))
-      .slice(0, 10);
-  }, [searchTerm, skus]);
+  // State for optimal masterpack results
+  const [optimalResults, setOptimalResults] = useState(null);
   
-  // Calculate arrangement for selected SKU
-  const arrangement = useMemo(() => {
-    if (!selectedSku || !config) return null;
-    return findBestArrangement(selectedSku, config);
-  }, [selectedSku, config]);
-  
-  // Calculate pallet stacking
-  const palletStacking = useMemo(() => {
-    if (!arrangement || !arrangement.fits || !config) return null;
+  // Find optimal masterpack
+  const handleOptimize = () => {
+    if (!config || !skus.length) return;
     
-    const caseDims = {
-      L: config.masterpack.external.L,
-      W: config.masterpack.external.W,
-      H: config.masterpack.external.H
-    };
+    setOptimizing(true);
     
-    return findBestPalletPattern(caseDims, config, targetPalletHeight);
-  }, [arrangement, config, targetPalletHeight]);
+    // Run optimization in next tick to allow UI to update
+    setTimeout(() => {
+      const results = findOptimalMasterpack(skus, config, {
+        minDim: 14,
+        maxDim: 22,
+        step: 1
+      });
+      setOptimalResults(results);
+      setOptimizing(false);
+      setView('optimal');
+    }, 100);
+  };
 
   if (loading) {
     return <div className="app loading">Loading configuration...</div>;
@@ -99,7 +85,7 @@ function App() {
   return (
     <div className="app">
       <header>
-        <h1>Masterpack Configuration Tool</h1>
+        <h1>Masterpack Optimization Dashboard</h1>
         
         <div className="controls">
           <div className="control-group">
@@ -122,141 +108,188 @@ function App() {
               <option value="both">Both</option>
             </select>
           </div>
+          
+          <button 
+            className="optimize-btn"
+            onClick={handleOptimize}
+            disabled={optimizing || !config}
+          >
+            {optimizing ? 'Optimizing...' : 'Find Optimal Box Size'}
+          </button>
         </div>
       </header>
       
       <main>
-        <div className="search-section">
-          <div className="search-box">
-            <label>Search SKU:</label>
-            <input
-              type="text"
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              placeholder="Type SKU name..."
-            />
-            
-            {filteredSkus.length > 0 && searchTerm && (
-              <div className="search-results">
-                {filteredSkus.map(sku => (
-                  <div
-                    key={sku.sku}
-                    className="search-result-item"
-                    onClick={() => handleSkuSelect(sku)}
-                  >
-                    {sku.sku} ({sku.L}×{sku.W}×{sku.H} in)
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-          
-          {recentSkus.length > 0 && (
-            <div className="recent-skus">
-              <label>Recent:</label>
-              {recentSkus.map(sku => (
-                <button
-                  key={sku.sku}
-                  onClick={() => handleSkuSelect(sku)}
-                  className="recent-sku-btn"
-                >
-                  {sku.sku}
-                </button>
-              ))}
-            </div>
-          )}
+        <div className="view-tabs">
+          <button 
+            className={view === 'current' ? 'tab active' : 'tab'}
+            onClick={() => setView('current')}
+          >
+            Current Masterpack (20×15×14)
+          </button>
+          <button 
+            className={view === 'optimal' ? 'tab active' : 'tab'}
+            onClick={() => setView('optimal')}
+            disabled={!optimalResults}
+          >
+            Optimal Masterpack {optimalResults && `(${optimalResults.optimal.dims.L}×${optimalResults.optimal.dims.W}×${optimalResults.optimal.dims.H})`}
+          </button>
         </div>
         
-        {selectedSku && arrangement && (
-          <div className="results-section">
-            {arrangement.fits ? (
-              <>
-                <div className="case-view">
-                  <h2>Case View: {selectedSku.sku}</h2>
-                  
-                  {selectedSku.current_baseline && (
-                    <div className="baseline">
-                      <strong>Current baseline:</strong> {selectedSku.current_baseline} units per case
-                    </div>
-                  )}
-                  
-                  <div className="arrangement-details">
-                    <div className="stat">
-                      <strong>Arrangement:</strong> {arrangement.nx} × {arrangement.ny} × {arrangement.nz} = {arrangement.count} units
-                    </div>
-                    <div className="stat">
-                      <strong>Rotation:</strong> {arrangement.rotation}
-                    </div>
-                    <div className="stat">
-                      <strong>Utilization:</strong> {(arrangement.utilization * 100).toFixed(1)}%
-                    </div>
-                    <div className="stat">
-                      <strong>Gross case weight:</strong> {formatWeight(arrangement.grossCaseWeight)}
-                    </div>
-                    
-                    {arrangement.isLowDensity && (
-                      <div className="warning">⚠️ Low pack density (&lt; 20 units)</div>
-                    )}
-                    {arrangement.isHeavy && (
-                      <div className="warning">⚠️ Heavy case (&gt; 40 lb)</div>
-                    )}
-                  </div>
-                  
-                  <div className="dimensions">
-                    <h3>Masterpack Dimensions</h3>
-                    <div className="stat">
-                      <strong>External:</strong> {formatDims(config.masterpack.external)[unitSystem]}
-                    </div>
-                    <div className="stat">
-                      <strong>Internal:</strong> {formatDims(arrangement.internalDims)[unitSystem]}
-                    </div>
-                  </div>
+        {view === 'current' && currentAnalysis && (
+          <div className="analysis-section">
+            <div className="summary-card">
+              <h2>Current Masterpack Analysis</h2>
+              <div className="summary-stats">
+                <div className="stat-box">
+                  <div className="stat-label">Total SKUs</div>
+                  <div className="stat-value">{currentAnalysis.summary.totalSkus}</div>
                 </div>
-                
-                {palletStacking && (
-                  <div className="pallet-view">
-                    <h2>Pallet View</h2>
-                    
-                    <div className="pallet-details">
-                      <div className="stat">
-                        <strong>Pattern:</strong> {palletStacking.pattern}
-                      </div>
-                      <div className="stat">
-                        <strong>Cases per layer:</strong> {palletStacking.casesPerLayer} ({palletStacking.casesWide} wide × {palletStacking.casesLong} long)
-                      </div>
-                      <div className="stat">
-                        <strong>Layers (tie-high):</strong> {palletStacking.maxLayers}
-                      </div>
-                      <div className="stat">
-                        <strong>Total cases:</strong> {palletStacking.totalCases}
-                      </div>
-                      <div className="stat">
-                        <strong>Pallet height:</strong> {palletStacking.palletHeight.toFixed(2)} in
-                      </div>
-                      <div className="stat">
-                        <strong>Coverage:</strong> {(palletStacking.coverage * 100).toFixed(1)}%
-                      </div>
-                      
-                      {palletStacking.exceedsOverhang && (
-                        <div className="warning">⚠️ Overhang exceeds limit ({config.solver.max_overhang_in} in)</div>
-                      )}
-                    </div>
-                  </div>
-                )}
-              </>
-            ) : (
-              <div className="no-fit">
-                <h2>SKU Does Not Fit</h2>
-                <p>{arrangement.reason}</p>
-                <p>Failing axis: {arrangement.failingAxis.join(', ')}</p>
+                <div className="stat-box">
+                  <div className="stat-label">Avg Squish Factor</div>
+                  <div className="stat-value">{currentAnalysis.summary.avgSquishFactor.toFixed(2)}x</div>
+                </div>
+                <div className="stat-box">
+                  <div className="stat-label">Avg Theoretical Util</div>
+                  <div className="stat-value">{(currentAnalysis.summary.avgTheoreticalUtil * 100).toFixed(1)}%</div>
+                </div>
+                <div className="stat-box">
+                  <div className="stat-label">Avg Actual Util</div>
+                  <div className="stat-value">{(currentAnalysis.summary.avgActualUtil * 100).toFixed(1)}%</div>
+                </div>
+                <div className="stat-box">
+                  <div className="stat-label">Problematic SKUs</div>
+                  <div className="stat-value">{currentAnalysis.summary.problematicSkus}</div>
+                </div>
               </div>
-            )}
+            </div>
+            
+            <div className="sku-table">
+              <h3>SKU Details</h3>
+              <table>
+                <thead>
+                  <tr>
+                    <th>SKU</th>
+                    <th>Dimensions</th>
+                    <th>Theoretical</th>
+                    <th>Actual</th>
+                    <th>Squish</th>
+                    <th>Util (Theo)</th>
+                    <th>Util (Actual)</th>
+                    <th>Rotation</th>
+                    <th>Weight</th>
+                    <th>Notes</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {currentAnalysis.results.map(result => (
+                    <tr key={result.sku} className={result.squishFactor > 1.2 || result.squishFactor < 0.8 ? 'problematic' : ''}>
+                      <td className="sku-name">{result.sku}</td>
+                      <td>{result.dims.L}×{result.dims.W}×{result.dims.H}</td>
+                      <td>{result.theoretical}</td>
+                      <td><strong>{result.actual}</strong></td>
+                      <td className={result.squishFactor > 1.2 ? 'high-squish' : result.squishFactor < 0.8 ? 'low-squish' : ''}>
+                        {result.squishFactor.toFixed(2)}x
+                      </td>
+                      <td>{(result.theoreticalUtil * 100).toFixed(1)}%</td>
+                      <td>{(result.actualUtil * 100).toFixed(1)}%</td>
+                      <td>{result.rotation}</td>
+                      <td>{result.weight.toFixed(1)} lb</td>
+                      <td className="notes">{result.notes}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           </div>
         )}
         
-        {!selectedSku && (
+        {view === 'optimal' && optimalResults && (
+          <div className="analysis-section">
+            <div className="summary-card optimal">
+              <h2>Optimal Masterpack: {optimalResults.optimal.dims.L}×{optimalResults.optimal.dims.W}×{optimalResults.optimal.dims.H} in</h2>
+              <div className="summary-stats">
+                <div className="stat-box">
+                  <div className="stat-label">Avg Utilization</div>
+                  <div className="stat-value">{(optimalResults.optimal.avgUtilization * 100).toFixed(1)}%</div>
+                </div>
+                <div className="stat-box">
+                  <div className="stat-label">Volume</div>
+                  <div className="stat-value">{optimalResults.optimal.totalVolume.toFixed(0)} in³</div>
+                </div>
+                <div className="stat-box">
+                  <div className="stat-label">vs Baseline</div>
+                  <div className="stat-value">{(optimalResults.optimal.avgBaselineRatio * 100).toFixed(0)}%</div>
+                </div>
+                <div className="stat-box">
+                  <div className="stat-label">Pallet Coverage</div>
+                  <div className="stat-value">{(optimalResults.optimal.palletFit.avgCoverage * 100).toFixed(1)}%</div>
+                </div>
+                <div className="stat-box">
+                  <div className="stat-label">Interlocking</div>
+                  <div className="stat-value">{optimalResults.optimal.palletFit.canInterlock ? '✓ Yes' : '✗ No'}</div>
+                </div>
+              </div>
+              
+              {optimalResults.optimal.palletFit.canInterlock && (
+                <div className="pallet-pattern">
+                  <h3>Interlocking Pattern</h3>
+                  <div className="pattern-details">
+                    <div>Layer 1: {optimalResults.optimal.palletFit.layer1Count} cases ({(optimalResults.optimal.palletFit.layer1Coverage * 100).toFixed(1)}% coverage)</div>
+                    <div>Layer 2: {optimalResults.optimal.palletFit.layer2Count} cases ({(optimalResults.optimal.palletFit.layer2Coverage * 100).toFixed(1)}% coverage)</div>
+                    <div>Pattern: Alternating 90° rotation per layer for stability</div>
+                  </div>
+                </div>
+              )}
+            </div>
+            
+            <div className="sku-table">
+              <h3>SKU Performance in Optimal Box</h3>
+              <table>
+                <thead>
+                  <tr>
+                    <th>SKU</th>
+                    <th>Fits</th>
+                    <th>Count</th>
+                    <th>Utilization</th>
+                    <th>vs Current</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {optimalResults.optimal.skuResults.map(result => (
+                    <tr key={result.sku}>
+                      <td className="sku-name">{result.sku}</td>
+                      <td>{result.fits ? '✓' : '✗'}</td>
+                      <td><strong>{result.count}</strong></td>
+                      <td>{(result.utilization * 100).toFixed(1)}%</td>
+                      <td className={result.count >= result.currentBaseline ? 'better' : 'worse'}>
+                        {result.currentBaseline > 0 ? `${((result.count / result.currentBaseline) * 100).toFixed(0)}%` : 'N/A'}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+            
+            <div className="top-candidates">
+              <h3>Other Top Candidates</h3>
+              <div className="candidates-grid">
+                {optimalResults.topCandidates.slice(1, 5).map((candidate, idx) => (
+                  <div key={idx} className="candidate-card">
+                    <h4>{candidate.dims.L}×{candidate.dims.W}×{candidate.dims.H} in</h4>
+                    <div>Util: {(candidate.avgUtilization * 100).toFixed(1)}%</div>
+                    <div>Vol: {candidate.totalVolume.toFixed(0)} in³</div>
+                    <div>Coverage: {(candidate.palletFit.avgCoverage * 100).toFixed(1)}%</div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
+        
+        {!currentAnalysis && !optimizing && (
           <div className="empty-state">
-            <p>Search for a SKU to see packing analysis</p>
+            <p>Loading SKU data...</p>
           </div>
         )}
       </main>
