@@ -3,7 +3,6 @@ import './App.css'
 import SkuSearch from './components/SkuSearch'
 import { sampleData } from './data/productData'
 import { findBestArrangement, calculateInternalDims, calculatePalletStacking } from './algorithms/masterpackOptimizer'
-import { SkuArrangementVisualization, PalletStackingVisualization } from './components/BoxVisualization'
 import { parseCSV } from './utils/csvParser'
 import ExportButton from './components/ExportButton'
 
@@ -20,9 +19,6 @@ function App() {
   // State for unit system (imperial/metric)
   const [unitSystem, setUnitSystem] = useState('imperial')
   
-  // State for showing 3D visualizations
-  const [showSkuVisualization, setShowSkuVisualization] = useState(false)
-  const [showPalletVisualization, setShowPalletVisualization] = useState(false)
   
   // Calculate masterpack internal dimensions
   const masterpackInternalDims = useMemo(() => {
@@ -141,15 +137,6 @@ function App() {
                 <p>Utilization: {(skuArrangement.utilization * 100).toFixed(1)}%</p>
               </div>
               
-              <button onClick={() => setShowSkuVisualization(!showSkuVisualization)}>
-                {showSkuVisualization ? 'Hide' : 'Show'} 3D Visualization
-              </button>
-              
-              {showSkuVisualization && selectedSku && skuArrangement && (
-                <div className="visualization">
-                  <SkuArrangementVisualization sku={selectedSku} arrangement={skuArrangement} />
-                </div>
-              )}
             </div>
           )}
           
@@ -167,18 +154,6 @@ function App() {
             <p>Pallet height: {palletStacking.palletHeight.toFixed(2)}"</p>
             <p>Coverage: {(palletStacking.coverage * 100).toFixed(1)}%</p>
             
-            <button onClick={() => setShowPalletVisualization(!showPalletVisualization)}>
-              {showPalletVisualization ? 'Hide' : 'Show'} 3D Visualization
-            </button>
-            
-            {showPalletVisualization && palletStacking && productData.masterpackCandidate.externalDims && (
-              <div className="visualization">
-                <PalletStackingVisualization 
-                  palletStacking={palletStacking} 
-                  masterpackExternalDims={productData.masterpackCandidate.externalDims} 
-                />
-              </div>
-            )}
           </div>
         </div>
       </main>
