@@ -1,0 +1,68 @@
+{
+  "global": {
+    "pallet": {
+      "length": 48,
+      "width": 40,
+      "height": 5.5,
+      "units": "in"
+    },
+    "targetPalletHeight": {
+      "value": 64,
+      "units": "in"
+    },
+    "corrugateWallThickness": {
+      "value": 0.1875,
+      "units": "in"
+    },
+    "squishPct": {
+      "x": 0.0,
+      "y": 0.02,
+      "z": 0.02
+    }
+  },
+  "masterpackCandidate": {
+    "externalDims": {
+      "L": 20,
+      "W": 15,
+      "H": 14,
+      "units": "in"
+    },
+    "tareWeight": {
+      "value": 14,
+      "units": "lb"
+    },
+    "currentCapacityEachSku": {
+      "KIT-ALPHA": 50
+    }
+  },
+  "skus": [
+    {
+      "sku": "KIT-ALPHA",
+      "unitDims": {
+        "L": 7.5,
+        "W": 5.0,
+        "H": 3.0,
+        "units": "in"
+      },
+      "unitWeight": {
+        "value": 12,
+        "units": "oz"
+      },
+      "notes": "Compressible along H"
+    },
+    {
+      "sku": "KIT-BETA",
+      "unitDims": {
+        "L": 9.0,
+        "W": 6.0,
+        "H": 4.0,
+        "units": "in"
+      },
+      "unitWeight": {
+        "value": 18,
+        "units": "oz"
+      },
+      "notes": ""
+    }
+  ]
+}
