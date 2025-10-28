@@ -137,9 +137,11 @@ function App() {
                 <p>Utilization: {(skuArrangement.utilization * 100).toFixed(1)}%</p>
               </div>
               
-              <div className="visualization">
-                <SkuArrangementVisualization sku={selectedSku} arrangement={skuArrangement} />
-              </div>
+              {selectedSku && skuArrangement && (
+                <div className="visualization">
+                  <SkuArrangementVisualization sku={selectedSku} arrangement={skuArrangement} />
+                </div>
+              )}
             </div>
           )}
           
@@ -157,12 +159,14 @@ function App() {
             <p>Pallet height: {palletStacking.palletHeight.toFixed(2)}"</p>
             <p>Coverage: {(palletStacking.coverage * 100).toFixed(1)}%</p>
             
-            <div className="visualization">
-              <PalletStackingVisualization 
-                palletStacking={palletStacking} 
-                masterpackExternalDims={productData.masterpackCandidate.externalDims} 
-              />
-            </div>
+            {palletStacking && productData.masterpackCandidate.externalDims && (
+              <div className="visualization">
+                <PalletStackingVisualization 
+                  palletStacking={palletStacking} 
+                  masterpackExternalDims={productData.masterpackCandidate.externalDims} 
+                />
+              </div>
+            )}
           </div>
         </div>
       </main>

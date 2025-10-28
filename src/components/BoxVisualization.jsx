@@ -1,5 +1,5 @@
 import { Canvas } from '@react-three/fiber'
-import { OrbitControls, Box } from '@react-three/drei'
+import { OrbitControls } from '@react-three/drei'
 import { useMemo } from 'react'
 
 // Simple box component
@@ -38,6 +38,11 @@ const WireframeBox = ({ position, dimensions, color = '#ff7f0e' }) => {
 
 // Visualization of a single SKU arrangement in a masterpack
 const SkuArrangementVisualization = ({ sku, arrangement }) => {
+  // Add error handling
+  if (!sku || !arrangement || !arrangement.orientation) {
+    return <div className="visualization-container">Select a SKU to see visualization</div>
+  }
+  
   const unitDims = sku.unitDims
   const orientedUnitDims = {
     width: unitDims[arrangement.orientation.x],
@@ -47,6 +52,11 @@ const SkuArrangementVisualization = ({ sku, arrangement }) => {
   
   // Calculate positions for each unit
   const units = useMemo(() => {
+    // Validate inputs
+    if (!arrangement.nx || !arrangement.ny || !arrangement.nz) {
+      return []
+    }
+    
     const unitsArray = []
     const spacing = 0.05 // Small gap between units for visualization
     
@@ -112,7 +122,17 @@ const SkuArrangementVisualization = ({ sku, arrangement }) => {
 
 // Visualization of pallet stacking
 const PalletStackingVisualization = ({ palletStacking, masterpackExternalDims }) => {
+  // Add error handling
+  if (!palletStacking || !masterpackExternalDims) {
+    return <div className="visualization-container">No pallet stacking data available</div>
+  }
+  
   const layers = useMemo(() => {
+    // Validate inputs
+    if (!palletStacking.maxLayers || !palletStacking.casesWide || !palletStacking.casesLong) {
+      return []
+    }
+    
     const layersArray = []
     
     // Only create visualization for up to 10 layers to avoid performance issues
