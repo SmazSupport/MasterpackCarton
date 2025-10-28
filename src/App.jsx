@@ -20,6 +20,10 @@ function App() {
   // State for unit system (imperial/metric)
   const [unitSystem, setUnitSystem] = useState('imperial')
   
+  // State for showing 3D visualizations
+  const [showSkuVisualization, setShowSkuVisualization] = useState(false)
+  const [showPalletVisualization, setShowPalletVisualization] = useState(false)
+  
   // Calculate masterpack internal dimensions
   const masterpackInternalDims = useMemo(() => {
     const externalDims = productData.masterpackCandidate.externalDims
@@ -137,7 +141,11 @@ function App() {
                 <p>Utilization: {(skuArrangement.utilization * 100).toFixed(1)}%</p>
               </div>
               
-              {selectedSku && skuArrangement && (
+              <button onClick={() => setShowSkuVisualization(!showSkuVisualization)}>
+                {showSkuVisualization ? 'Hide' : 'Show'} 3D Visualization
+              </button>
+              
+              {showSkuVisualization && selectedSku && skuArrangement && (
                 <div className="visualization">
                   <SkuArrangementVisualization sku={selectedSku} arrangement={skuArrangement} />
                 </div>
@@ -159,7 +167,11 @@ function App() {
             <p>Pallet height: {palletStacking.palletHeight.toFixed(2)}"</p>
             <p>Coverage: {(palletStacking.coverage * 100).toFixed(1)}%</p>
             
-            {palletStacking && productData.masterpackCandidate.externalDims && (
+            <button onClick={() => setShowPalletVisualization(!showPalletVisualization)}>
+              {showPalletVisualization ? 'Hide' : 'Show'} 3D Visualization
+            </button>
+            
+            {showPalletVisualization && palletStacking && productData.masterpackCandidate.externalDims && (
               <div className="visualization">
                 <PalletStackingVisualization 
                   palletStacking={palletStacking} 

@@ -1,3 +1,4 @@
+import { Suspense } from 'react'
 import { Canvas } from '@react-three/fiber'
 import { OrbitControls } from '@react-three/drei'
 import { useMemo } from 'react'
@@ -6,9 +7,9 @@ import { useMemo } from 'react'
 const BoxComponent = ({ position, dimensions, color = '#1f77b4' }) => {
   // Convert dimensions to ensure they're positive
   const dims = {
-    width: Math.abs(dimensions.width || 1),
-    height: Math.abs(dimensions.height || 1),
-    depth: Math.abs(dimensions.depth || 1)
+    width: Math.abs(dimensions?.width || 1),
+    height: Math.abs(dimensions?.height || 1),
+    depth: Math.abs(dimensions?.depth || 1)
   }
   
   return (
@@ -23,9 +24,9 @@ const BoxComponent = ({ position, dimensions, color = '#1f77b4' }) => {
 const WireframeBox = ({ position, dimensions, color = '#ff7f0e' }) => {
   // Convert dimensions to ensure they're positive
   const dims = {
-    width: Math.abs(dimensions.width || 1),
-    height: Math.abs(dimensions.height || 1),
-    depth: Math.abs(dimensions.depth || 1)
+    width: Math.abs(dimensions?.width || 1),
+    height: Math.abs(dimensions?.height || 1),
+    depth: Math.abs(dimensions?.depth || 1)
   }
   
   return (
@@ -93,27 +94,29 @@ const SkuArrangementVisualization = ({ sku, arrangement }) => {
       <h3>SKU Arrangement in Masterpack</h3>
       <div style={{ height: '300px', width: '100%' }}>
         <Canvas camera={{ position: [Math.max(masterpackDims.width, masterpackDims.height, masterpackDims.depth) * 2, Math.max(masterpackDims.width, masterpackDims.height, masterpackDims.depth) * 2, Math.max(masterpackDims.width, masterpackDims.height, masterpackDims.depth) * 2], fov: 50 }}>
-          <ambientLight intensity={0.5} />
-          <pointLight position={[10, 10, 10]} />
-          
-          {/* Masterpack wireframe */}
-          <WireframeBox 
-            position={[0, 0, 0]} 
-            dimensions={masterpackDims} 
-            color="#ff7f0e" 
-          />
-          
-          {/* Individual units */}
-          {units.map(unit => (
-            <BoxComponent 
-              key={unit.id}
-              position={unit.position}
-              dimensions={unit.dimensions}
-              color="#1f77b4"
+          <Suspense fallback={null}>
+            <ambientLight intensity={0.5} />
+            <pointLight position={[10, 10, 10]} />
+            
+            {/* Masterpack wireframe */}
+            <WireframeBox 
+              position={[0, 0, 0]} 
+              dimensions={masterpackDims} 
+              color="#ff7f0e" 
             />
-          ))}
-          
-          <OrbitControls />
+            
+            {/* Individual units */}
+            {units.map(unit => (
+              <BoxComponent 
+                key={unit.id}
+                position={unit.position}
+                dimensions={unit.dimensions}
+                color="#1f77b4"
+              />
+            ))}
+            
+            <OrbitControls />
+          </Suspense>
         </Canvas>
       </div>
     </div>
@@ -168,27 +171,29 @@ const PalletStackingVisualization = ({ palletStacking, masterpackExternalDims })
       <h3>Pallet Stacking</h3>
       <div style={{ height: '300px', width: '100%' }}>
         <Canvas camera={{ position: [70, 50, 70], fov: 50 }}>
-          <ambientLight intensity={0.5} />
-          <pointLight position={[100, 100, 100]} />
-          
-          {/* Pallet base */}
-          <BoxComponent 
-            position={[0, -2.5, 0]} 
-            dimensions={{ width: 40, height: 5, depth: 48 }} 
-            color="#8c564b" 
-          />
-          
-          {/* Masterpack cases */}
-          {layers.map(caseItem => (
+          <Suspense fallback={null}>
+            <ambientLight intensity={0.5} />
+            <pointLight position={[100, 100, 100]} />
+            
+            {/* Pallet base */}
             <BoxComponent 
-              key={caseItem.id}
-              position={caseItem.position}
-              dimensions={caseItem.dimensions}
-              color="#1f77b4"
+              position={[0, -2.5, 0]} 
+              dimensions={{ width: 40, height: 5, depth: 48 }} 
+              color="#8c564b" 
             />
-          ))}
-          
-          <OrbitControls />
+            
+            {/* Masterpack cases */}
+            {layers.map(caseItem => (
+              <BoxComponent 
+                key={caseItem.id}
+                position={caseItem.position}
+                dimensions={caseItem.dimensions}
+                color="#1f77b4"
+              />
+            ))}
+            
+            <OrbitControls />
+          </Suspense>
         </Canvas>
       </div>
     </div>
