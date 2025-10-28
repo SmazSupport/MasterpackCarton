@@ -1,35 +1,58 @@
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useEffect } from 'react'
 import './App.css'
-import SkuSearch from './components/SkuSearch'
-import { sampleData } from './data/productData'
-import { findBestArrangement, calculateInternalDims, calculatePalletStacking } from './algorithms/masterpackOptimizer'
-import { parseCSV } from './utils/csvParser'
-import ExportButton from './components/ExportButton'
+import { findBestArrangement } from './solver/innerPack'
+import { findBestPalletPattern } from './solver/palletizer'
+import { formatDims, formatWeight } from './utils/units'
 
 function App() {
-  // State for product data
-  const [productData, setProductData] = useState(sampleData)
+  // State for configuration and SKU data
+  const [config, setConfig] = useState(null)
+  const [skus, setSkus] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(null)
   
-  // State for selected SKU
+  // State for user inputs
+  const [targetPalletHeight, setTargetPalletHeight] = useState(64)
+  const [unitSystem, setUnitSystem] = useState('both')
+  const [searchTerm, setSearchTerm] = useState('')
   const [selectedSku, setSelectedSku] = useState(null)
-  
-  // State for recently viewed SKUs
   const [recentSkus, setRecentSkus] = useState([])
+  const [selectedPattern, setSelectedPattern] = useState('column')
   
-  // State for unit system (imperial/metric)
-  const [unitSystem, setUnitSystem] = useState('imperial')
-  
-  
-  // Calculate masterpack internal dimensions
-  const masterpackInternalDims = useMemo(() => {
-    const externalDims = productData.masterpackCandidate.externalDims
-    const wallThickness = productData.global.corrugateWallThickness.value
-    return calculateInternalDims(externalDims, wallThickness)
-  }, [productData])
+  // Load static data on mount
+  useEffect(() => {
+    const loadData = async () => {
+      try {
+        const [configRes, skusRes] = await Promise.all([
+          fetch('/data/config.json'),
+          fetch('/data/skus.json')
+        ]);
+        
+        if (!configRes.ok || !skusRes.ok) {
+          throw new Error('Failed to load data files');
+        }
+        
+        const configData = await configRes.json();
+        const skusData = await skusRes.json();
+        
+        setConfig(configData);
+        setSkus(skusData);
+        setTargetPalletHeight(configData.default_pallet_height);
+        setLoading(false);
+      } catch (err) {
+        console.error('Error loading data:', err);
+        setError(err.message);
+        setLoading(false);
+      }
+    };
+    
+    loadData();
+  }, []);
   
   // Handle SKU selection
   const handleSkuSelect = (sku) => {
     setSelectedSku(sku)
+    setSearchTerm(sku.sku)
     
     // Add to recent SKUs (limit to 5)
     if (!recentSkus.some(recent => recent.sku === sku.sku)) {
@@ -37,125 +60,205 @@ function App() {
     }
   }
   
-  // Handle file upload
-  const handleFileUpload = (event) => {
-    const file = event.target.files[0]
-    if (file) {
-      const reader = new FileReader()
-      reader.onload = (e) => {
-        try {
-          if (file.name.endsWith('.json')) {
-            const data = JSON.parse(e.target.result)
-            setProductData(data)
-          } else if (file.name.endsWith('.csv')) {
-            const skus = parseCSV(e.target.result)
-            setProductData(prev => ({
-              ...prev,
-              skus
-            }))
-          } else {
-            alert('Unsupported file format. Please upload a JSON or CSV file.')
-          }
-        } catch (error) {
-          console.error('Error parsing file:', error)
-          alert('Error parsing file. Please check the format.')
-        }
-      }
-      reader.readAsText(file)
-    }
-  }
+  // Filter SKUs based on search term
+  const filteredSkus = useMemo(() => {
+    if (!searchTerm) return [];
+    const term = searchTerm.toLowerCase();
+    return skus
+      .filter(sku => sku.sku.toLowerCase().includes(term))
+      .slice(0, 10);
+  }, [searchTerm, skus]);
   
-  // Get arrangement for selected SKU
-  const skuArrangement = useMemo(() => {
-    if (!selectedSku) return null
-    return findBestArrangement(selectedSku, masterpackInternalDims)
-  }, [selectedSku, masterpackInternalDims])
+  // Calculate arrangement for selected SKU
+  const arrangement = useMemo(() => {
+    if (!selectedSku || !config) return null;
+    return findBestArrangement(selectedSku, config);
+  }, [selectedSku, config]);
   
   // Calculate pallet stacking
   const palletStacking = useMemo(() => {
-    const externalDims = productData.masterpackCandidate.externalDims
-    return calculatePalletStacking(externalDims, productData.global)
-  }, [productData])
+    if (!arrangement || !arrangement.fits || !config) return null;
+    
+    const caseDims = {
+      L: config.masterpack.external.L,
+      W: config.masterpack.external.W,
+      H: config.masterpack.external.H
+    };
+    
+    return findBestPalletPattern(caseDims, config, targetPalletHeight);
+  }, [arrangement, config, targetPalletHeight]);
 
+  if (loading) {
+    return <div className="app loading">Loading configuration...</div>;
+  }
+  
+  if (error) {
+    return <div className="app error">Error: {error}</div>;
+  }
+  
   return (
     <div className="app">
       <header>
-        <h1>Box Product Configuration Tool</h1>
+        <h1>Masterpack Configuration Tool</h1>
         
         <div className="controls">
-          <div className="unit-toggle">
-            <label>
-              <input
-                type="radio"
-                value="imperial"
-                checked={unitSystem === 'imperial'}
-                onChange={() => setUnitSystem('imperial')}
-              />
-              Imperial
-            </label>
-            <label>
-              <input
-                type="radio"
-                value="metric"
-                checked={unitSystem === 'metric'}
-                onChange={() => setUnitSystem('metric')}
-              />
-              Metric
-            </label>
-          </div>
-          
-          <div className="file-upload">
-            <input 
-              type="file" 
-              accept=".json,.csv" 
-              onChange={handleFileUpload} 
+          <div className="control-group">
+            <label>Target Pallet Height (in):</label>
+            <input
+              type="number"
+              value={targetPalletHeight}
+              onChange={(e) => setTargetPalletHeight(Number(e.target.value))}
+              min="40"
+              max="100"
+              step="1"
             />
           </div>
           
-          <div className="export-button">
-            <ExportButton skus={productData.skus} fileName="box-config-export" />
+          <div className="control-group">
+            <label>Units:</label>
+            <select value={unitSystem} onChange={(e) => setUnitSystem(e.target.value)}>
+              <option value="imperial">Imperial</option>
+              <option value="metric">Metric</option>
+              <option value="both">Both</option>
+            </select>
           </div>
         </div>
       </header>
       
       <main>
         <div className="search-section">
-          <SkuSearch 
-            skus={productData.skus}
-            onSkuSelect={handleSkuSelect}
-            recentSkus={recentSkus}
-          />
-        </div>
-        
-        <div className="results-section">
-          {selectedSku && skuArrangement && (
-            <div className="sku-results">
-              <h2>SKU: {selectedSku.sku}</h2>
-              <div className="arrangement-details">
-                <p>Best arrangement: {skuArrangement.nx} × {skuArrangement.ny} × {skuArrangement.nz} = {skuArrangement.count} units</p>
-                <p>Orientation: X→{skuArrangement.orientation.x}, Y→{skuArrangement.orientation.y}, Z→{skuArrangement.orientation.z}</p>
-                <p>Utilization: {(skuArrangement.utilization * 100).toFixed(1)}%</p>
+          <div className="search-box">
+            <label>Search SKU:</label>
+            <input
+              type="text"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              placeholder="Type SKU name..."
+            />
+            
+            {filteredSkus.length > 0 && searchTerm && (
+              <div className="search-results">
+                {filteredSkus.map(sku => (
+                  <div
+                    key={sku.sku}
+                    className="search-result-item"
+                    onClick={() => handleSkuSelect(sku)}
+                  >
+                    {sku.sku} ({sku.L}×{sku.W}×{sku.H} in)
+                  </div>
+                ))}
               </div>
-              
+            )}
+          </div>
+          
+          {recentSkus.length > 0 && (
+            <div className="recent-skus">
+              <label>Recent:</label>
+              {recentSkus.map(sku => (
+                <button
+                  key={sku.sku}
+                  onClick={() => handleSkuSelect(sku)}
+                  className="recent-sku-btn"
+                >
+                  {sku.sku}
+                </button>
+              ))}
             </div>
           )}
-          
-          <div className="masterpack-details">
-            <h2>Masterpack Details</h2>
-            <p>External dimensions: {productData.masterpackCandidate.externalDims.L}" × {productData.masterpackCandidate.externalDims.W}" × {productData.masterpackCandidate.externalDims.H}"</p>
-            <p>Internal dimensions: {masterpackInternalDims.L.toFixed(2)}" × {masterpackInternalDims.W.toFixed(2)}" × {masterpackInternalDims.H.toFixed(2)}"</p>
-          </div>
-          
-          <div className="pallet-details">
-            <h2>Pallet Stacking</h2>
-            <p>Cases per layer: {palletStacking.casesPerLayer} ({palletStacking.casesWide} wide × {palletStacking.casesLong} long)</p>
-            <p>Layers: {palletStacking.maxLayers}</p>
-            <p>Total cases per pallet: {palletStacking.totalCases}</p>
-            <p>Pallet height: {palletStacking.palletHeight.toFixed(2)}"</p>
-            <p>Coverage: {(palletStacking.coverage * 100).toFixed(1)}%</p>
-            
-          </div>
         </div>
+        
+        {selectedSku && arrangement && (
+          <div className="results-section">
+            {arrangement.fits ? (
+              <>
+                <div className="case-view">
+                  <h2>Case View: {selectedSku.sku}</h2>
+                  
+                  {selectedSku.current_baseline && (
+                    <div className="baseline">
+                      <strong>Current baseline:</strong> {selectedSku.current_baseline} units per case
+                    </div>
+                  )}
+                  
+                  <div className="arrangement-details">
+                    <div className="stat">
+                      <strong>Arrangement:</strong> {arrangement.nx} × {arrangement.ny} × {arrangement.nz} = {arrangement.count} units
+                    </div>
+                    <div className="stat">
+                      <strong>Rotation:</strong> {arrangement.rotation}
+                    </div>
+                    <div className="stat">
+                      <strong>Utilization:</strong> {(arrangement.utilization * 100).toFixed(1)}%
+                    </div>
+                    <div className="stat">
+                      <strong>Gross case weight:</strong> {formatWeight(arrangement.grossCaseWeight)}
+                    </div>
+                    
+                    {arrangement.isLowDensity && (
+                      <div className="warning">⚠️ Low pack density (&lt; 20 units)</div>
+                    )}
+                    {arrangement.isHeavy && (
+                      <div className="warning">⚠️ Heavy case (&gt; 40 lb)</div>
+                    )}
+                  </div>
+                  
+                  <div className="dimensions">
+                    <h3>Masterpack Dimensions</h3>
+                    <div className="stat">
+                      <strong>External:</strong> {formatDims(config.masterpack.external)[unitSystem]}
+                    </div>
+                    <div className="stat">
+                      <strong>Internal:</strong> {formatDims(arrangement.internalDims)[unitSystem]}
+                    </div>
+                  </div>
+                </div>
+                
+                {palletStacking && (
+                  <div className="pallet-view">
+                    <h2>Pallet View</h2>
+                    
+                    <div className="pallet-details">
+                      <div className="stat">
+                        <strong>Pattern:</strong> {palletStacking.pattern}
+                      </div>
+                      <div className="stat">
+                        <strong>Cases per layer:</strong> {palletStacking.casesPerLayer} ({palletStacking.casesWide} wide × {palletStacking.casesLong} long)
+                      </div>
+                      <div className="stat">
+                        <strong>Layers (tie-high):</strong> {palletStacking.maxLayers}
+                      </div>
+                      <div className="stat">
+                        <strong>Total cases:</strong> {palletStacking.totalCases}
+                      </div>
+                      <div className="stat">
+                        <strong>Pallet height:</strong> {palletStacking.palletHeight.toFixed(2)} in
+                      </div>
+                      <div className="stat">
+                        <strong>Coverage:</strong> {(palletStacking.coverage * 100).toFixed(1)}%
+                      </div>
+                      
+                      {palletStacking.exceedsOverhang && (
+                        <div className="warning">⚠️ Overhang exceeds limit ({config.solver.max_overhang_in} in)</div>
+                      )}
+                    </div>
+                  </div>
+                )}
+              </>
+            ) : (
+              <div className="no-fit">
+                <h2>SKU Does Not Fit</h2>
+                <p>{arrangement.reason}</p>
+                <p>Failing axis: {arrangement.failingAxis.join(', ')}</p>
+              </div>
+            )}
+          </div>
+        )}
+        
+        {!selectedSku && (
+          <div className="empty-state">
+            <p>Search for a SKU to see packing analysis</p>
+          </div>
+        )}
       </main>
     </div>
   )

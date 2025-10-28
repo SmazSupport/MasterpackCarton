@@ -1,0 +1,28 @@
+{
+  "units": "in",
+  "pallet": {
+    "L": 48,
+    "W": 40,
+    "H": 5.5
+  },
+  "default_pallet_height": 64,
+  "masterpack": {
+    "external": {
+      "L": 20,
+      "W": 15,
+      "H": 14
+    },
+    "tare_lb": 14,
+    "wall_thickness_in": 0.19
+  },
+  "solver": {
+    "squish_pct": {
+      "x": 0.00,
+      "y": 0.02,
+      "z": 0.02
+    },
+    "prefer_multiples_of": 6,
+    "allow_patterns": ["column", "brick", "pinwheel", "swap-40-48"],
+    "max_overhang_in": 0.5
+  }
+}

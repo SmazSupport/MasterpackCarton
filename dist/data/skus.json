@@ -1,0 +1,20 @@
+[
+  {
+    "sku": "KIT-ALPHA",
+    "L": 7.5,
+    "W": 5.0,
+    "H": 3.0,
+    "oz": 12,
+    "notes": "Compressible along H",
+    "current_baseline": 50
+  },
+  {
+    "sku": "KIT-BETA",
+    "L": 9.0,
+    "W": 6.0,
+    "H": 4.0,
+    "oz": 18,
+    "notes": "",
+    "current_baseline": null
+  }
+]
