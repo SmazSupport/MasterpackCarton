@@ -1,42 +1,362 @@
 [
   {
-    "sku": "KIT-ALPHA",
-    "L": 7.5,
-    "W": 5.0,
-    "H": 3.0,
-    "oz": 12,
-    "notes": "Compressible along H",
+    "sku": "33GR",
+    "L": 7.0,
+    "W": 2.5,
+    "H": 6.0,
+    "oz": 3.2,
+    "notes": "Squished dimensions - compressible from 9H to 6H",
     "current_baseline": 50,
-    "compressible": true
+    "compressible": true,
+    "original_H": 9.0,
+    "box_dims": {
+      "L": 20.0,
+      "W": 15.0,
+      "H": 13.5
+    },
+    "box_weight_lb": 13.05,
+    "squish_factor": 0.667
   },
   {
-    "sku": "KIT-BETA",
-    "L": 9.0,
-    "W": 6.0,
-    "H": 4.0,
-    "oz": 18,
-    "notes": "Rigid",
-    "current_baseline": 30,
-    "compressible": false
+    "sku": "33WS",
+    "L": 6.5,
+    "W": 2.5,
+    "H": 6.0,
+    "oz": 3.2,
+    "notes": "Squished dimensions - compressible from 9H to 6H",
+    "current_baseline": 50,
+    "compressible": true,
+    "original_H": 9.0,
+    "box_dims": {
+      "L": 20.0,
+      "W": 15.5,
+      "H": 13.5
+    },
+    "box_weight_lb": 12.20,
+    "squish_factor": 0.667
   },
   {
-    "sku": "KIT-GAMMA",
-    "L": 6.0,
-    "W": 4.5,
-    "H": 2.5,
-    "oz": 10,
-    "notes": "Compressible",
-    "current_baseline": 72,
-    "compressible": true
+    "sku": "33HK-02",
+    "L": 7.0,
+    "W": 2.0,
+    "H": 7.0,
+    "oz": 4.0,
+    "notes": "Squished dimensions - compressible from 9H to 7H",
+    "current_baseline": 50,
+    "compressible": true,
+    "original_H": 9.0,
+    "box_dims": {
+      "L": 20.0,
+      "W": 15.5,
+      "H": 13.5
+    },
+    "box_weight_lb": 15.05,
+    "squish_factor": 0.778
   },
   {
-    "sku": "KIT-DELTA",
-    "L": 8.0,
-    "W": 5.5,
-    "H": 3.5,
-    "oz": 15,
-    "notes": "Semi-rigid",
-    "current_baseline": 42,
-    "compressible": true
+    "sku": "11SN",
+    "L": 6.5,
+    "W": 2.5,
+    "H": 6.5,
+    "oz": 4.8,
+    "notes": "Squished dimensions - compressible from 9H to 6.5H",
+    "current_baseline": 50,
+    "compressible": true,
+    "original_H": 9.0,
+    "box_dims": {
+      "L": 20.0,
+      "W": 15.5,
+      "H": 14.0
+    },
+    "box_weight_lb": 16.15,
+    "squish_factor": 0.722
+  },
+  {
+    "sku": "33EN",
+    "L": 6.5,
+    "W": 2.5,
+    "H": 6.0,
+    "oz": 4.8,
+    "notes": "Squished dimensions - compressible from 9H to 6H",
+    "current_baseline": 50,
+    "compressible": true,
+    "original_H": 9.0,
+    "box_dims": {
+      "L": 20.0,
+      "W": 15.5,
+      "H": 16.0
+    },
+    "box_weight_lb": 16.95,
+    "squish_factor": 0.667
+  },
+  {
+    "sku": "43CK-ZBB",
+    "L": 7.5,
+    "W": 3.0,
+    "H": 7.0,
+    "oz": 5.6,
+    "notes": "Squished dimensions - compressible from 9H to 7H",
+    "current_baseline": 50,
+    "compressible": true,
+    "original_H": 9.0,
+    "box_dims": {
+      "L": 20.0,
+      "W": 15.5,
+      "H": 16.0
+    },
+    "box_weight_lb": 17.05,
+    "squish_factor": 0.778
+  },
+  {
+    "sku": "33WN",
+    "L": 7.0,
+    "W": 2.0,
+    "H": 7.0,
+    "oz": 4.0,
+    "notes": "Squished dimensions - compressible from 9H to 7H",
+    "current_baseline": 50,
+    "compressible": true,
+    "original_H": 9.0,
+    "box_dims": {
+      "L": 20.0,
+      "W": 15.5,
+      "H": 14.0
+    },
+    "box_weight_lb": 15.25,
+    "squish_factor": 0.778
+  },
+  {
+    "sku": "33SN",
+    "L": 6.5,
+    "W": 3.0,
+    "H": 6.5,
+    "oz": 4.0,
+    "notes": "Squished dimensions - compressible from 9H to 6.5H",
+    "current_baseline": 50,
+    "compressible": true,
+    "original_H": 9.0,
+    "box_dims": {
+      "L": 20.0,
+      "W": 15.5,
+      "H": 14.0
+    },
+    "box_weight_lb": 15.15,
+    "squish_factor": 0.722
+  },
+  {
+    "sku": "33WM",
+    "L": 6.5,
+    "W": 3.0,
+    "H": 6.5,
+    "oz": 4.0,
+    "notes": "Squished dimensions - compressible from 9H to 6.5H",
+    "current_baseline": 50,
+    "compressible": true,
+    "original_H": 9.0,
+    "box_dims": {
+      "L": 20.0,
+      "W": 15.5,
+      "H": 14.0
+    },
+    "box_weight_lb": 15.40,
+    "squish_factor": 0.722
+  },
+  {
+    "sku": "11PG",
+    "L": 6.5,
+    "W": 2.5,
+    "H": 6.5,
+    "oz": 4.0,
+    "notes": "Squished dimensions - compressible from 9H to 6.5H",
+    "current_baseline": 50,
+    "compressible": true,
+    "original_H": 9.0,
+    "box_dims": {
+      "L": 20.0,
+      "W": 15.5,
+      "H": 14.0
+    },
+    "box_weight_lb": 13.85,
+    "squish_factor": 0.722
+  },
+  {
+    "sku": "11UN",
+    "L": 6.5,
+    "W": 2.5,
+    "H": 6.5,
+    "oz": 4.8,
+    "notes": "Squished dimensions - compressible from 9H to 6.5H",
+    "current_baseline": 50,
+    "compressible": true,
+    "original_H": 9.0,
+    "box_dims": {
+      "L": 20.0,
+      "W": 15.5,
+      "H": 14.0
+    },
+    "box_weight_lb": 15.80,
+    "squish_factor": 0.722
+  },
+  {
+    "sku": "11SL",
+    "L": 6.5,
+    "W": 2.5,
+    "H": 6.5,
+    "oz": 4.0,
+    "notes": "Squished dimensions - compressible from 9H to 6.5H",
+    "current_baseline": 50,
+    "compressible": true,
+    "original_H": 9.0,
+    "box_dims": {
+      "L": 20.0,
+      "W": 15.5,
+      "H": 14.0
+    },
+    "box_weight_lb": 14.05,
+    "squish_factor": 0.722
+  },
+  {
+    "sku": "11WA",
+    "L": 6.5,
+    "W": 2.5,
+    "H": 6.5,
+    "oz": 3.2,
+    "notes": "Squished dimensions - compressible from 9H to 6.5H",
+    "current_baseline": 50,
+    "compressible": true,
+    "original_H": 9.0,
+    "box_dims": {
+      "L": 20.0,
+      "W": 15.5,
+      "H": 14.0
+    },
+    "box_weight_lb": 12.80,
+    "squish_factor": 0.722
+  },
+  {
+    "sku": "11NW",
+    "L": 6.5,
+    "W": 2.5,
+    "H": 6.5,
+    "oz": 4.0,
+    "notes": "Squished dimensions - compressible from 9H to 6.5H",
+    "current_baseline": 50,
+    "compressible": true,
+    "original_H": 9.0,
+    "box_dims": {
+      "L": 20.0,
+      "W": 15.0,
+      "H": 14.0
+    },
+    "box_weight_lb": 13.50,
+    "squish_factor": 0.722
+  },
+  {
+    "sku": "11ME",
+    "L": 6.5,
+    "W": 2.5,
+    "H": 6.0,
+    "oz": 4.0,
+    "notes": "Squished dimensions - compressible from 9H to 6H",
+    "current_baseline": 50,
+    "compressible": true,
+    "original_H": 9.0,
+    "box_dims": {
+      "L": 20.0,
+      "W": 15.5,
+      "H": 14.0
+    },
+    "box_weight_lb": 15.50,
+    "squish_factor": 0.667
+  },
+  {
+    "sku": "11FX",
+    "L": 6.5,
+    "W": 2.5,
+    "H": 6.0,
+    "oz": 4.0,
+    "notes": "Squished dimensions - compressible from 9H to 6H",
+    "current_baseline": 50,
+    "compressible": true,
+    "original_H": 9.0,
+    "box_dims": {
+      "L": 20.0,
+      "W": 15.5,
+      "H": 14.0
+    },
+    "box_weight_lb": 13.75,
+    "squish_factor": 0.667
+  },
+  {
+    "sku": "11KP",
+    "L": 6.5,
+    "W": 2.0,
+    "H": 6.0,
+    "oz": 4.0,
+    "notes": "Squished dimensions - compressible from 9H to 6H",
+    "current_baseline": 50,
+    "compressible": true,
+    "original_H": 9.0,
+    "box_dims": {
+      "L": 20.0,
+      "W": 15.0,
+      "H": 14.0
+    },
+    "box_weight_lb": 14.20,
+    "squish_factor": 0.667
+  },
+  {
+    "sku": "11FG",
+    "L": 6.5,
+    "W": 3.0,
+    "H": 5.5,
+    "oz": 3.2,
+    "notes": "Squished dimensions - compressible from 9H to 5.5H",
+    "current_baseline": 50,
+    "compressible": true,
+    "original_H": 9.0,
+    "box_dims": {
+      "L": 20.0,
+      "W": 15.5,
+      "H": 14.0
+    },
+    "box_weight_lb": 12.70,
+    "squish_factor": 0.611
+  },
+  {
+    "sku": "X11CP",
+    "L": 10.0,
+    "W": 3.5,
+    "H": 9.0,
+    "oz": 12.8,
+    "notes": "Squished dimensions - compressible from 13.5H to 9H, only 20 per box",
+    "current_baseline": 20,
+    "compressible": true,
+    "original_H": 13.5,
+    "box_dims": {
+      "L": 20.0,
+      "W": 15.5,
+      "H": 16.0
+    },
+    "box_weight_lb": 18.55,
+    "squish_factor": 0.667
+  },
+  {
+    "sku": "T22GIR",
+    "L": 7.0,
+    "W": 3.5,
+    "H": 6.5,
+    "oz": 6.4,
+    "notes": "Squished dimensions - compressible from 9H to 6.5H, only 40 per box",
+    "current_baseline": 40,
+    "compressible": true,
+    "original_H": 9.0,
+    "box_dims": {
+      "L": 20.0,
+      "W": 15.5,
+      "H": 16.0
+    },
+    "box_weight_lb": 18.45,
+    "squish_factor": 0.722
   }
 ]

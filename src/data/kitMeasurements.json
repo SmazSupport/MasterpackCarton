@@ -1,0 +1,833 @@
+{
+  "metadata": {
+    "description": "Kit measurement data with box dimensions, squished/original item measurements, and calculated volumes",
+    "lastUpdated": "2025-10-29",
+    "units": "inches",
+    "weightUnits": "pounds",
+    "defaultQuantity": 50,
+    "exceptions": {
+      "X11CP": 20,
+      "T22GIR": 40
+    }
+  },
+  "kits": [
+    {
+      "sku": "33GR",
+      "quantity": 50,
+      "box": {
+        "dimensions": {
+          "width": 15.0,
+          "length": 20.0,
+          "height": 13.5
+        },
+        "weight": 13.05,
+        "volume": 4050.0
+      },
+      "squished": {
+        "dimensions": {
+          "width": 7.0,
+          "length": 2.5,
+          "height": 6.0
+        },
+        "weight": 0.20,
+        "volume": 105.0
+      },
+      "original": {
+        "dimensions": {
+          "width": 7.0,
+          "length": 2.5,
+          "height": 9.0
+        },
+        "weight": 0.20,
+        "volume": 157.5
+      },
+      "calculations": {
+        "squishFactor": 0.667,
+        "volumeReduction": 0.333,
+        "utilizationBox": 0.773,
+        "utilizationSquished": 0.026,
+        "perItemVolumeInBox": 81.0,
+        "totalSquishedVolume": 5250.0,
+        "totalOriginalVolume": 7875.0
+      }
+    },
+    {
+      "sku": "33WS",
+      "quantity": 50,
+      "box": {
+        "dimensions": {
+          "width": 15.5,
+          "length": 20.0,
+          "height": 13.5
+        },
+        "weight": 12.20,
+        "volume": 4185.0
+      },
+      "squished": {
+        "dimensions": {
+          "width": 6.5,
+          "length": 2.5,
+          "height": 6.0
+        },
+        "weight": 0.20,
+        "volume": 97.5
+      },
+      "original": {
+        "dimensions": {
+          "width": 6.5,
+          "length": 2.5,
+          "height": 9.0
+        },
+        "weight": 0.20,
+        "volume": 146.25
+      },
+      "calculations": {
+        "squishFactor": 0.667,
+        "volumeReduction": 0.333,
+        "utilizationBox": 0.749,
+        "utilizationSquished": 0.023,
+        "perItemVolumeInBox": 83.7,
+        "totalSquishedVolume": 4875.0,
+        "totalOriginalVolume": 7312.5
+      }
+    },
+    {
+      "sku": "33HK-02",
+      "quantity": 50,
+      "box": {
+        "dimensions": {
+          "width": 15.5,
+          "length": 20.0,
+          "height": 13.5
+        },
+        "weight": 15.05,
+        "volume": 4185.0
+      },
+      "squished": {
+        "dimensions": {
+          "width": 7.0,
+          "length": 2.0,
+          "height": 7.0
+        },
+        "weight": 0.25,
+        "volume": 98.0
+      },
+      "original": {
+        "dimensions": {
+          "width": 7.0,
+          "length": 2.0,
+          "height": 9.0
+        },
+        "weight": 0.25,
+        "volume": 126.0
+      },
+      "calculations": {
+        "squishFactor": 0.778,
+        "volumeReduction": 0.222,
+        "utilizationBox": 0.753,
+        "utilizationSquished": 0.023,
+        "perItemVolumeInBox": 83.7,
+        "totalSquishedVolume": 4900.0,
+        "totalOriginalVolume": 6300.0
+      }
+    },
+    {
+      "sku": "11SN",
+      "quantity": 50,
+      "box": {
+        "dimensions": {
+          "width": 15.5,
+          "length": 20.0,
+          "height": 14.0
+        },
+        "weight": 16.15,
+        "volume": 4340.0
+      },
+      "squished": {
+        "dimensions": {
+          "width": 6.5,
+          "length": 2.5,
+          "height": 6.5
+        },
+        "weight": 0.30,
+        "volume": 105.625
+      },
+      "original": {
+        "dimensions": {
+          "width": 6.5,
+          "length": 2.5,
+          "height": 9.0
+        },
+        "weight": 0.30,
+        "volume": 146.25
+      },
+      "calculations": {
+        "squishFactor": 0.722,
+        "volumeReduction": 0.278,
+        "utilizationBox": 0.768,
+        "utilizationSquished": 0.024,
+        "perItemVolumeInBox": 86.8,
+        "totalSquishedVolume": 5281.25,
+        "totalOriginalVolume": 7312.5
+      }
+    },
+    {
+      "sku": "33EN",
+      "quantity": 50,
+      "box": {
+        "dimensions": {
+          "width": 15.5,
+          "length": 20.0,
+          "height": 16.0
+        },
+        "weight": 16.95,
+        "volume": 4960.0
+      },
+      "squished": {
+        "dimensions": {
+          "width": 6.5,
+          "length": 2.5,
+          "height": 6.0
+        },
+        "weight": 0.30,
+        "volume": 97.5
+      },
+      "original": {
+        "dimensions": {
+          "width": 6.5,
+          "length": 2.5,
+          "height": 9.0
+        },
+        "weight": 0.30,
+        "volume": 146.25
+      },
+      "calculations": {
+        "squishFactor": 0.667,
+        "volumeReduction": 0.333,
+        "utilizationBox": 0.872,
+        "utilizationSquished": 0.020,
+        "perItemVolumeInBox": 99.2,
+        "totalSquishedVolume": 4875.0,
+        "totalOriginalVolume": 7312.5
+      }
+    },
+    {
+      "sku": "43CK-ZBB",
+      "quantity": 50,
+      "box": {
+        "dimensions": {
+          "width": 15.5,
+          "length": 20.0,
+          "height": 16.0
+        },
+        "weight": 17.05,
+        "volume": 4960.0
+      },
+      "squished": {
+        "dimensions": {
+          "width": 7.5,
+          "length": 3.0,
+          "height": 7.0
+        },
+        "weight": 0.35,
+        "volume": 157.5
+      },
+      "original": {
+        "dimensions": {
+          "width": 7.5,
+          "length": 3.0,
+          "height": 9.0
+        },
+        "weight": 0.35,
+        "volume": 202.5
+      },
+      "calculations": {
+        "squishFactor": 0.778,
+        "volumeReduction": 0.222,
+        "utilizationBox": 0.872,
+        "utilizationSquished": 0.032,
+        "perItemVolumeInBox": 99.2,
+        "totalSquishedVolume": 7875.0,
+        "totalOriginalVolume": 10125.0
+      }
+    },
+    {
+      "sku": "33WN",
+      "quantity": 50,
+      "box": {
+        "dimensions": {
+          "width": 15.5,
+          "length": 20.0,
+          "height": 14.0
+        },
+        "weight": 15.25,
+        "volume": 4340.0
+      },
+      "squished": {
+        "dimensions": {
+          "width": 7.0,
+          "length": 2.0,
+          "height": 7.0
+        },
+        "weight": 0.25,
+        "volume": 98.0
+      },
+      "original": {
+        "dimensions": {
+          "width": 7.0,
+          "length": 2.0,
+          "height": 9.0
+        },
+        "weight": 0.25,
+        "volume": 126.0
+      },
+      "calculations": {
+        "squishFactor": 0.778,
+        "volumeReduction": 0.222,
+        "utilizationBox": 0.768,
+        "utilizationSquished": 0.023,
+        "perItemVolumeInBox": 86.8,
+        "totalSquishedVolume": 4900.0,
+        "totalOriginalVolume": 6300.0
+      }
+    },
+    {
+      "sku": "33SN",
+      "quantity": 50,
+      "box": {
+        "dimensions": {
+          "width": 15.5,
+          "length": 20.0,
+          "height": 14.0
+        },
+        "weight": 15.15,
+        "volume": 4340.0
+      },
+      "squished": {
+        "dimensions": {
+          "width": 6.5,
+          "length": 3.0,
+          "height": 6.5
+        },
+        "weight": 0.25,
+        "volume": 126.75
+      },
+      "original": {
+        "dimensions": {
+          "width": 6.5,
+          "length": 3.0,
+          "height": 9.0
+        },
+        "weight": 0.25,
+        "volume": 175.5
+      },
+      "calculations": {
+        "squishFactor": 0.722,
+        "volumeReduction": 0.278,
+        "utilizationBox": 0.768,
+        "utilizationSquished": 0.029,
+        "perItemVolumeInBox": 86.8,
+        "totalSquishedVolume": 6337.5,
+        "totalOriginalVolume": 8775.0
+      }
+    },
+    {
+      "sku": "33WM",
+      "quantity": 50,
+      "box": {
+        "dimensions": {
+          "width": 15.5,
+          "length": 20.0,
+          "height": 14.0
+        },
+        "weight": 15.40,
+        "volume": 4340.0
+      },
+      "squished": {
+        "dimensions": {
+          "width": 6.5,
+          "length": 3.0,
+          "height": 6.5
+        },
+        "weight": 0.25,
+        "volume": 126.75
+      },
+      "original": {
+        "dimensions": {
+          "width": 6.5,
+          "length": 3.0,
+          "height": 9.0
+        },
+        "weight": 0.25,
+        "volume": 175.5
+      },
+      "calculations": {
+        "squishFactor": 0.722,
+        "volumeReduction": 0.278,
+        "utilizationBox": 0.768,
+        "utilizationSquished": 0.029,
+        "perItemVolumeInBox": 86.8,
+        "totalSquishedVolume": 6337.5,
+        "totalOriginalVolume": 8775.0
+      }
+    },
+    {
+      "sku": "11PG",
+      "quantity": 50,
+      "box": {
+        "dimensions": {
+          "width": 15.5,
+          "length": 20.0,
+          "height": 14.0
+        },
+        "weight": 13.85,
+        "volume": 4340.0
+      },
+      "squished": {
+        "dimensions": {
+          "width": 6.5,
+          "length": 2.5,
+          "height": 6.5
+        },
+        "weight": 0.25,
+        "volume": 105.625
+      },
+      "original": {
+        "dimensions": {
+          "width": 6.5,
+          "length": 2.5,
+          "height": 9.0
+        },
+        "weight": 0.25,
+        "volume": 146.25
+      },
+      "calculations": {
+        "squishFactor": 0.722,
+        "volumeReduction": 0.278,
+        "utilizationBox": 0.768,
+        "utilizationSquished": 0.024,
+        "perItemVolumeInBox": 86.8,
+        "totalSquishedVolume": 5281.25,
+        "totalOriginalVolume": 7312.5
+      }
+    },
+    {
+      "sku": "11UN",
+      "quantity": 50,
+      "box": {
+        "dimensions": {
+          "width": 15.5,
+          "length": 20.0,
+          "height": 14.0
+        },
+        "weight": 15.80,
+        "volume": 4340.0
+      },
+      "squished": {
+        "dimensions": {
+          "width": 6.5,
+          "length": 2.5,
+          "height": 6.5
+        },
+        "weight": 0.30,
+        "volume": 105.625
+      },
+      "original": {
+        "dimensions": {
+          "width": 6.5,
+          "length": 2.5,
+          "height": 9.0
+        },
+        "weight": 0.30,
+        "volume": 146.25
+      },
+      "calculations": {
+        "squishFactor": 0.722,
+        "volumeReduction": 0.278,
+        "utilizationBox": 0.768,
+        "utilizationSquished": 0.024,
+        "perItemVolumeInBox": 86.8,
+        "totalSquishedVolume": 5281.25,
+        "totalOriginalVolume": 7312.5
+      }
+    },
+    {
+      "sku": "11SL",
+      "quantity": 50,
+      "box": {
+        "dimensions": {
+          "width": 15.5,
+          "length": 20.0,
+          "height": 14.0
+        },
+        "weight": 14.05,
+        "volume": 4340.0
+      },
+      "squished": {
+        "dimensions": {
+          "width": 6.5,
+          "length": 2.5,
+          "height": 6.5
+        },
+        "weight": 0.25,
+        "volume": 105.625
+      },
+      "original": {
+        "dimensions": {
+          "width": 6.5,
+          "length": 2.5,
+          "height": 9.0
+        },
+        "weight": 0.25,
+        "volume": 146.25
+      },
+      "calculations": {
+        "squishFactor": 0.722,
+        "volumeReduction": 0.278,
+        "utilizationBox": 0.768,
+        "utilizationSquished": 0.024,
+        "perItemVolumeInBox": 86.8,
+        "totalSquishedVolume": 5281.25,
+        "totalOriginalVolume": 7312.5
+      }
+    },
+    {
+      "sku": "11WA",
+      "quantity": 50,
+      "box": {
+        "dimensions": {
+          "width": 15.5,
+          "length": 20.0,
+          "height": 14.0
+        },
+        "weight": 12.80,
+        "volume": 4340.0
+      },
+      "squished": {
+        "dimensions": {
+          "width": 6.5,
+          "length": 2.5,
+          "height": 6.5
+        },
+        "weight": 0.20,
+        "volume": 105.625
+      },
+      "original": {
+        "dimensions": {
+          "width": 6.5,
+          "length": 2.5,
+          "height": 9.0
+        },
+        "weight": 0.20,
+        "volume": 146.25
+      },
+      "calculations": {
+        "squishFactor": 0.722,
+        "volumeReduction": 0.278,
+        "utilizationBox": 0.768,
+        "utilizationSquished": 0.024,
+        "perItemVolumeInBox": 86.8,
+        "totalSquishedVolume": 5281.25,
+        "totalOriginalVolume": 7312.5
+      }
+    },
+    {
+      "sku": "11NW",
+      "quantity": 50,
+      "box": {
+        "dimensions": {
+          "width": 15.0,
+          "length": 20.0,
+          "height": 14.0
+        },
+        "weight": 13.50,
+        "volume": 4200.0
+      },
+      "squished": {
+        "dimensions": {
+          "width": 6.5,
+          "length": 2.5,
+          "height": 6.5
+        },
+        "weight": 0.25,
+        "volume": 105.625
+      },
+      "original": {
+        "dimensions": {
+          "width": 6.5,
+          "length": 2.5,
+          "height": 9.0
+        },
+        "weight": 0.25,
+        "volume": 146.25
+      },
+      "calculations": {
+        "squishFactor": 0.722,
+        "volumeReduction": 0.278,
+        "utilizationBox": 0.744,
+        "utilizationSquished": 0.025,
+        "perItemVolumeInBox": 84.0,
+        "totalSquishedVolume": 5281.25,
+        "totalOriginalVolume": 7312.5
+      }
+    },
+    {
+      "sku": "11ME",
+      "quantity": 50,
+      "box": {
+        "dimensions": {
+          "width": 15.5,
+          "length": 20.0,
+          "height": 14.0
+        },
+        "weight": 15.50,
+        "volume": 4340.0
+      },
+      "squished": {
+        "dimensions": {
+          "width": 6.5,
+          "length": 2.5,
+          "height": 6.0
+        },
+        "weight": 0.25,
+        "volume": 97.5
+      },
+      "original": {
+        "dimensions": {
+          "width": 6.5,
+          "length": 2.5,
+          "height": 9.0
+        },
+        "weight": 0.25,
+        "volume": 146.25
+      },
+      "calculations": {
+        "squishFactor": 0.667,
+        "volumeReduction": 0.333,
+        "utilizationBox": 0.768,
+        "utilizationSquished": 0.022,
+        "perItemVolumeInBox": 86.8,
+        "totalSquishedVolume": 4875.0,
+        "totalOriginalVolume": 7312.5
+      }
+    },
+    {
+      "sku": "11FX",
+      "quantity": 50,
+      "box": {
+        "dimensions": {
+          "width": 15.5,
+          "length": 20.0,
+          "height": 14.0
+        },
+        "weight": 13.75,
+        "volume": 4340.0
+      },
+      "squished": {
+        "dimensions": {
+          "width": 6.5,
+          "length": 2.5,
+          "height": 6.0
+        },
+        "weight": 0.25,
+        "volume": 97.5
+      },
+      "original": {
+        "dimensions": {
+          "width": 6.5,
+          "length": 2.5,
+          "height": 9.0
+        },
+        "weight": 0.25,
+        "volume": 146.25
+      },
+      "calculations": {
+        "squishFactor": 0.667,
+        "volumeReduction": 0.333,
+        "utilizationBox": 0.768,
+        "utilizationSquished": 0.022,
+        "perItemVolumeInBox": 86.8,
+        "totalSquishedVolume": 4875.0,
+        "totalOriginalVolume": 7312.5
+      }
+    },
+    {
+      "sku": "11KP",
+      "quantity": 50,
+      "box": {
+        "dimensions": {
+          "width": 15.0,
+          "length": 20.0,
+          "height": 14.0
+        },
+        "weight": 14.20,
+        "volume": 4200.0
+      },
+      "squished": {
+        "dimensions": {
+          "width": 6.5,
+          "length": 2.0,
+          "height": 6.0
+        },
+        "weight": 0.25,
+        "volume": 78.0
+      },
+      "original": {
+        "dimensions": {
+          "width": 6.5,
+          "length": 2.0,
+          "height": 9.0
+        },
+        "weight": 0.25,
+        "volume": 117.0
+      },
+      "calculations": {
+        "squishFactor": 0.667,
+        "volumeReduction": 0.333,
+        "utilizationBox": 0.744,
+        "utilizationSquished": 0.019,
+        "perItemVolumeInBox": 84.0,
+        "totalSquishedVolume": 3900.0,
+        "totalOriginalVolume": 5850.0
+      }
+    },
+    {
+      "sku": "11FG",
+      "quantity": 50,
+      "box": {
+        "dimensions": {
+          "width": 15.5,
+          "length": 20.0,
+          "height": 14.0
+        },
+        "weight": 12.70,
+        "volume": 4340.0
+      },
+      "squished": {
+        "dimensions": {
+          "width": 6.5,
+          "length": 3.0,
+          "height": 5.5
+        },
+        "weight": 0.20,
+        "volume": 107.25
+      },
+      "original": {
+        "dimensions": {
+          "width": 6.5,
+          "length": 3.0,
+          "height": 9.0
+        },
+        "weight": 0.20,
+        "volume": 175.5
+      },
+      "calculations": {
+        "squishFactor": 0.611,
+        "volumeReduction": 0.389,
+        "utilizationBox": 0.768,
+        "utilizationSquished": 0.025,
+        "perItemVolumeInBox": 86.8,
+        "totalSquishedVolume": 5362.5,
+        "totalOriginalVolume": 8775.0
+      }
+    },
+    {
+      "sku": "X11CP",
+      "quantity": 20,
+      "box": {
+        "dimensions": {
+          "width": 15.5,
+          "length": 20.0,
+          "height": 16.0
+        },
+        "weight": 18.55,
+        "volume": 4960.0
+      },
+      "squished": {
+        "dimensions": {
+          "width": 10.0,
+          "length": 3.5,
+          "height": 9.0
+        },
+        "weight": 0.80,
+        "volume": 315.0
+      },
+      "original": {
+        "dimensions": {
+          "width": 10.0,
+          "length": 3.5,
+          "height": 13.5
+        },
+        "weight": 0.80,
+        "volume": 472.5
+      },
+      "calculations": {
+        "squishFactor": 0.667,
+        "volumeReduction": 0.333,
+        "utilizationBox": 0.872,
+        "utilizationSquished": 0.064,
+        "perItemVolumeInBox": 248.0,
+        "totalSquishedVolume": 6300.0,
+        "totalOriginalVolume": 9450.0
+      }
+    },
+    {
+      "sku": "T22GIR",
+      "quantity": 40,
+      "box": {
+        "dimensions": {
+          "width": 15.5,
+          "length": 20.0,
+          "height": 16.0
+        },
+        "weight": 18.45,
+        "volume": 4960.0
+      },
+      "squished": {
+        "dimensions": {
+          "width": 7.0,
+          "length": 3.5,
+          "height": 6.5
+        },
+        "weight": 0.40,
+        "volume": 159.25
+      },
+      "original": {
+        "dimensions": {
+          "width": 7.0,
+          "length": 3.5,
+          "height": 9.0
+        },
+        "weight": 0.40,
+        "volume": 220.5
+      },
+      "calculations": {
+        "squishFactor": 0.722,
+        "volumeReduction": 0.278,
+        "utilizationBox": 0.872,
+        "utilizationSquished": 0.032,
+        "perItemVolumeInBox": 124.0,
+        "totalSquishedVolume": 6370.0,
+        "totalOriginalVolume": 8820.0
+      }
+    }
+  ],
+  "summary": {
+    "totalKits": 20,
+    "averageSquishFactor": 0.704,
+    "averageVolumeReduction": 0.296,
+    "averageBoxUtilization": 0.787,
+    "boxDimensions": {
+      "mostCommon": {
+        "width": 15.5,
+        "length": 20.0,
+        "height": 14.0
+      },
+      "tallest": {
+        "width": 15.5,
+        "length": 20.0,
+        "height": 16.0
+      }
+    }
+  }
+}

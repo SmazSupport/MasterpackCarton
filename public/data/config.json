@@ -8,9 +8,9 @@
   "default_pallet_height": 64,
   "masterpack": {
     "external": {
-      "L": 20,
-      "W": 15,
-      "H": 14
+      "L": 20.0,
+      "W": 15.5,
+      "H": 14.0
     },
     "tare_lb": 14,
     "wall_thickness_in": 0.19

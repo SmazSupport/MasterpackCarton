@@ -10,10 +10,20 @@ export const analyzeCurrentMasterpack = (skus, config) => {
   const results = skus.map(sku => {
     const theoretical = findBestArrangement(sku, config);
     
-    // Calculate squish factor from actual vs theoretical
-    const squishFactor = sku.current_baseline && theoretical.fits 
-      ? sku.current_baseline / theoretical.count 
-      : 1.0;
+    // Use real squish factor from data if available, otherwise calculate
+    const squishFactor = sku.squish_factor || (
+      sku.current_baseline && theoretical.fits 
+        ? sku.current_baseline / theoretical.count 
+        : 1.0
+    );
+    
+    // Calculate real box utilization if box dimensions are available
+    let boxUtilization = 0;
+    if (sku.box_dims) {
+      const boxVolume = sku.box_dims.L * sku.box_dims.W * sku.box_dims.H;
+      const itemVolume = sku.L * sku.W * sku.H;
+      boxUtilization = (itemVolume * sku.current_baseline) / boxVolume;
+    }
     
     return {
       sku: sku.sku,
@@ -25,10 +35,13 @@ export const analyzeCurrentMasterpack = (skus, config) => {
       actualUtil: theoretical.fits && sku.current_baseline 
         ? (sku.current_baseline / theoretical.count) * theoretical.utilization 
         : 0,
+      boxUtilization: boxUtilization, // Real box utilization
       rotation: theoretical.fits ? theoretical.rotation : 'N/A',
-      weight: theoretical.fits ? theoretical.grossCaseWeight : 0,
+      weight: theoretical.fits ? theoretical.grossCaseWeight : (sku.box_weight_lb || 0),
       compressible: sku.compressible,
-      notes: sku.notes
+      notes: sku.notes,
+      originalHeight: sku.original_H,
+      currentBoxDims: sku.box_dims
     };
   });
   
@@ -38,7 +51,9 @@ export const analyzeCurrentMasterpack = (skus, config) => {
     avgSquishFactor: results.reduce((sum, r) => sum + r.squishFactor, 0) / results.length,
     avgTheoreticalUtil: results.reduce((sum, r) => sum + r.theoreticalUtil, 0) / results.length,
     avgActualUtil: results.reduce((sum, r) => sum + r.actualUtil, 0) / results.length,
-    problematicSkus: results.filter(r => r.squishFactor > 1.2 || r.squishFactor < 0.8).length
+    avgBoxUtilization: results.reduce((sum, r) => sum + (r.boxUtilization || 0), 0) / results.length,
+    problematicSkus: results.filter(r => r.squishFactor > 1.2 || r.squishFactor < 0.8).length,
+    underutilizedSkus: results.filter(r => (r.boxUtilization || 0) < 0.75).length
   };
   
   return { results, summary };

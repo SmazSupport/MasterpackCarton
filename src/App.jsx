@@ -125,7 +125,7 @@ function App() {
             className={view === 'current' ? 'tab active' : 'tab'}
             onClick={() => setView('current')}
           >
-            Current Masterpack (20×15×14)
+            Current Masterpack ({config?.masterpack?.external?.L || 20}×{config?.masterpack?.external?.W || 15.5}×{config?.masterpack?.external?.H || 14})
           </button>
           <button 
             className={view === 'optimal' ? 'tab active' : 'tab'}
@@ -150,8 +150,8 @@ function App() {
                   <div className="stat-value">{currentAnalysis.summary.avgSquishFactor.toFixed(2)}x</div>
                 </div>
                 <div className="stat-box">
-                  <div className="stat-label">Avg Theoretical Util</div>
-                  <div className="stat-value">{(currentAnalysis.summary.avgTheoreticalUtil * 100).toFixed(1)}%</div>
+                  <div className="stat-label">Avg Box Utilization</div>
+                  <div className="stat-value">{(currentAnalysis.summary.avgBoxUtilization * 100).toFixed(1)}%</div>
                 </div>
                 <div className="stat-box">
                   <div className="stat-label">Avg Actual Util</div>
@@ -160,6 +160,10 @@ function App() {
                 <div className="stat-box">
                   <div className="stat-label">Problematic SKUs</div>
                   <div className="stat-value">{currentAnalysis.summary.problematicSkus}</div>
+                </div>
+                <div className="stat-box">
+                  <div className="stat-label">Underutilized (&lt;75%)</div>
+                  <div className="stat-value">{currentAnalysis.summary.underutilizedSkus}</div>
                 </div>
               </div>
             </div>
@@ -171,10 +175,11 @@ function App() {
                   <tr>
                     <th>SKU</th>
                     <th>Dimensions</th>
+                    <th>Current Box</th>
                     <th>Theoretical</th>
                     <th>Actual</th>
                     <th>Squish</th>
-                    <th>Util (Theo)</th>
+                    <th>Box Util</th>
                     <th>Util (Actual)</th>
                     <th>Rotation</th>
                     <th>Weight</th>
@@ -186,12 +191,15 @@ function App() {
                     <tr key={result.sku} className={result.squishFactor > 1.2 || result.squishFactor < 0.8 ? 'problematic' : ''}>
                       <td className="sku-name">{result.sku}</td>
                       <td>{result.dims.L}×{result.dims.W}×{result.dims.H}</td>
+                      <td>{result.currentBoxDims ? `${result.currentBoxDims.L}×${result.currentBoxDims.W}×${result.currentBoxDims.H}` : 'N/A'}</td>
                       <td>{result.theoretical}</td>
                       <td><strong>{result.actual}</strong></td>
                       <td className={result.squishFactor > 1.2 ? 'high-squish' : result.squishFactor < 0.8 ? 'low-squish' : ''}>
                         {result.squishFactor.toFixed(2)}x
                       </td>
-                      <td>{(result.theoreticalUtil * 100).toFixed(1)}%</td>
+                      <td className={(result.boxUtilization || 0) < 0.75 ? 'low-utilization' : ''}>
+                        {((result.boxUtilization || 0) * 100).toFixed(1)}%
+                      </td>
                       <td>{(result.actualUtil * 100).toFixed(1)}%</td>
                       <td>{result.rotation}</td>
                       <td>{result.weight.toFixed(1)} lb</td>
@@ -200,6 +208,47 @@ function App() {
                   ))}
                 </tbody>
               </table>
+            </div>
+            
+            {/* Optimization Opportunities Section */}
+            <div className="optimization-section">
+              <h3>Box Optimization Opportunities</h3>
+              <div className="optimization-grid">
+                {currentAnalysis.results
+                  .filter(result => (result.boxUtilization || 0) < 0.75)
+                  .slice(0, 6)
+                  .map(result => (
+                    <div key={result.sku} className="optimization-card">
+                      <h4>{result.sku}</h4>
+                      <div className="optimization-metrics">
+                        <div className="metric">
+                          <span className="metric-label">Current Box Util:</span>
+                          <span className="metric-value low">{((result.boxUtilization || 0) * 100).toFixed(1)}%</span>
+                        </div>
+                        <div className="metric">
+                          <span className="metric-label">Items per Box:</span>
+                          <span className="metric-value">{result.actual}</span>
+                        </div>
+                        <div className="metric">
+                          <span className="metric-label">Squish Factor:</span>
+                          <span className="metric-value">{result.squishFactor.toFixed(2)}x</span>
+                        </div>
+                        <div className="metric">
+                          <span className="metric-label">Current Box:</span>
+                          <span className="metric-value">{result.currentBoxDims ? `${result.currentBoxDims.L}×${result.currentBoxDims.W}×${result.currentBoxDims.H}` : 'N/A'}</span>
+                        </div>
+                      </div>
+                      <div className="optimization-note">
+                        <strong>Recommendation:</strong> Consider smaller box size or different orientation
+                      </div>
+                    </div>
+                  ))}
+              </div>
+              {currentAnalysis.results.filter(result => (result.boxUtilization || 0) < 0.75).length === 0 && (
+                <div className="no-optimizations">
+                  <p>✓ All kits have good box utilization (≥75%)</p>
+                </div>
+              )}
             </div>
           </div>
         )}

@@ -283,14 +283,14 @@ header h1 {
   color: #0d6efd;
 }
 
-.high-squish {
-  color: #dc3545;
-  font-weight: 700;
-}
-
 .low-squish {
   color: #fd7e14;
   font-weight: 700;
+}
+
+.low-utilization {
+  color: #dc3545;
+  font-weight: 600;
 }
 
 .notes {
@@ -307,6 +307,92 @@ header h1 {
 .worse {
   color: #dc3545;
   font-weight: 700;
+}
+
+/* Optimization Section */
+.optimization-section {
+  background: white;
+  padding: 1.5rem;
+  border-radius: 8px;
+  margin-top: 1.5rem;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.08);
+}
+
+.optimization-section h3 {
+  margin: 0 0 1rem 0;
+  color: #212529;
+  font-size: 1.25rem;
+  font-weight: 600;
+}
+
+.optimization-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1rem;
+}
+
+.optimization-card {
+  background: #fff8f0;
+  border: 1px solid #ffe0b2;
+  border-radius: 6px;
+  padding: 1rem;
+  border-left: 4px solid #ff9800;
+}
+
+.optimization-card h4 {
+  margin: 0 0 0.75rem 0;
+  color: #e65100;
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.optimization-metrics {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.metric {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.875rem;
+}
+
+.metric-label {
+  color: #6c757d;
+  font-weight: 500;
+}
+
+.metric-value {
+  font-weight: 600;
+  color: #212529;
+}
+
+.metric-value.low {
+  color: #dc3545;
+}
+
+.optimization-note {
+  font-size: 0.8rem;
+  color: #495057;
+  padding-top: 0.5rem;
+  border-top: 1px solid #ffe0b2;
+}
+
+.no-optimizations {
+  text-align: center;
+  padding: 2rem;
+  color: #198754;
+  font-weight: 500;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .optimization-grid {
+    grid-template-columns: 1fr;
+  }
 }
 
 /* Top Candidates */
