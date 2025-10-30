@@ -2,6 +2,7 @@ import { useState, useMemo, useEffect } from 'react'
 import './App.css'
 import { analyzeCurrentMasterpack, findOptimalMasterpack } from './solver/multiSkuOptimizer'
 import { formatDims, formatWeight } from './utils/units'
+import { getKitSummaryStats, getKitsBySquishFactor, getKitsByUtilization } from './utils/kitAnalysis'
 
 function App() {
   // State for configuration and SKU data
@@ -10,11 +11,10 @@ function App() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
   
-  // State for user inputs
+  // State for optimization
   const [targetPalletHeight, setTargetPalletHeight] = useState(64)
-  const [unitSystem, setUnitSystem] = useState('both')
-  const [view, setView] = useState('current') // 'current' or 'optimal'
   const [optimizing, setOptimizing] = useState(false)
+  const [optimalResults, setOptimalResults] = useState(null)
   
   // Load static data on mount
   useEffect(() => {
@@ -52,11 +52,14 @@ function App() {
     return analyzeCurrentMasterpack(skus, config);
   }, [config, skus]);
   
-  // State for optimal masterpack results
-  const [optimalResults, setOptimalResults] = useState(null);
+  // Get kit statistics
+  const kitStats = useMemo(() => {
+    if (!skus.length) return null;
+    return getKitSummaryStats();
+  }, [skus]);
   
-  // Find optimal masterpack
-  const handleOptimize = () => {
+  // Find optimal box
+  const handleFindOptimalBox = () => {
     if (!config || !skus.length) return;
     
     setOptimizing(true);
@@ -66,16 +69,15 @@ function App() {
       const results = findOptimalMasterpack(skus, config, {
         minDim: 14,
         maxDim: 22,
-        step: 1
+        step: 0.5
       });
       setOptimalResults(results);
       setOptimizing(false);
-      setView('optimal');
     }, 100);
   };
-
+  
   if (loading) {
-    return <div className="app loading">Loading configuration...</div>;
+    return <div className="app loading">Loading kit measurement data...</div>;
   }
   
   if (error) {
@@ -84,264 +86,222 @@ function App() {
   
   return (
     <div className="app">
-      <header>
-        <h1>Masterpack Optimization Dashboard</h1>
-        
-        <div className="controls">
-          <div className="control-group">
-            <label>Target Pallet Height (in):</label>
-            <input
-              type="number"
-              value={targetPalletHeight}
-              onChange={(e) => setTargetPalletHeight(Number(e.target.value))}
-              min="40"
-              max="100"
-              step="1"
-            />
-          </div>
-          
-          <div className="control-group">
-            <label>Units:</label>
-            <select value={unitSystem} onChange={(e) => setUnitSystem(e.target.value)}>
-              <option value="imperial">Imperial</option>
-              <option value="metric">Metric</option>
-              <option value="both">Both</option>
-            </select>
-          </div>
-          
-          <button 
-            className="optimize-btn"
-            onClick={handleOptimize}
-            disabled={optimizing || !config}
-          >
-            {optimizing ? 'Optimizing...' : 'Find Optimal Box Size'}
-          </button>
-        </div>
+      <header className="app-header">
+        <h1>📦 Single Box Optimizer</h1>
+        <p className="subtitle">Find the optimal box size for ALL products with pallet interlocking</p>
       </header>
       
-      <main>
-        <div className="view-tabs">
+      {/* Section 1: Data Overview */}
+      <section className="data-overview">
+        <h2>📊 Product Data Overview</h2>
+        <div className="stats-grid">
+          <div className="stat-card">
+            <div className="stat-value">{skus.length}</div>
+            <div className="stat-label">Total Products</div>
+          </div>
+          <div className="stat-card">
+            <div className="stat-value">{kitStats?.averageSquishFactor.toFixed(3)}</div>
+            <div className="stat-label">Avg Squish Factor</div>
+          </div>
+          <div className="stat-card">
+            <div className="stat-value">{(kitStats?.averageBoxUtilization * 100).toFixed(1)}%</div>
+            <div className="stat-label">Avg Box Utilization</div>
+          </div>
+          <div className="stat-card">
+            <div className="stat-value">{Object.keys(kitStats?.boxSizeDistribution || {}).length}</div>
+            <div className="stat-label">Different Box Sizes</div>
+          </div>
+        </div>
+        
+        <div className="data-table">
+          <h3>All Kit Measurements</h3>
+          <div className="table-wrapper">
+            <table>
+              <thead>
+                <tr>
+                  <th>SKU</th>
+                  <th>Quantity</th>
+                  <th>Squished Size</th>
+                  <th>Original Size</th>
+                  <th>Box Size</th>
+                  <th>Box Util</th>
+                  <th>Squish Factor</th>
+                  <th>Weight</th>
+                </tr>
+              </thead>
+              <tbody>
+                {skus.map(sku => (
+                  <tr key={sku.sku}>
+                    <td className="sku-name">{sku.sku}</td>
+                    <td>{sku.current_baseline}</td>
+                    <td>{sku.L}×{sku.W}×{sku.H}</td>
+                    <td>{sku.L}×{sku.W}×{sku.original_H}</td>
+                    <td>{sku.box_dims ? `${sku.box_dims.L}×${sku.box_dims.W}×${sku.box_dims.H}` : 'N/A'}</td>
+                    <td className={currentAnalysis?.results.find(r => r.sku === sku.sku)?.boxUtilization < 0.75 ? 'low-util' : ''}>
+                      {currentAnalysis?.results.find(r => r.sku === sku.sku)?.boxUtilization 
+                        ? `${(currentAnalysis.results.find(r => r.sku === sku.sku).boxUtilization * 100).toFixed(1)}%`
+                        : 'N/A'}
+                    </td>
+                    <td>{sku.squish_factor.toFixed(3)}</td>
+                    <td>{sku.oz}oz</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+      
+      {/* Section 2: Pallet Configuration */}
+      <section className="pallet-config">
+        <h2>🏗️ Pallet Configuration & Constraints</h2>
+        <div className="pallet-info">
+          <div className="pallet-dims">
+            <h3>Standard Pallet</h3>
+            <div className="dim-display">
+              <span className="dim">{config.pallet.L}" × {config.pallet.W}"</span>
+              <span className="dim-label">Length × Width</span>
+            </div>
+          </div>
+          
+          <div className="pallet-height">
+            <h3>Max Stack Height</h3>
+            <div className="height-control">
+              <input
+                type="range"
+                min="48"
+                max="96"
+                step="2"
+                value={targetPalletHeight}
+                onChange={(e) => setTargetPalletHeight(Number(e.target.value))}
+                className="height-slider"
+              />
+              <div className="height-display">
+                <span className="height-value">{targetPalletHeight}"</span>
+                <span className="height-label">inches</span>
+              </div>
+            </div>
+          </div>
+          
+          <div className="interlocking-info">
+            <h3>🔄 Interlocking Requirement</h3>
+            <p>Boxes must fit in both orientations for stable alternating layers:</p>
+            <div className="orientation-display">
+              <div className="orientation">
+                <span>Layer 1: {config.masterpack.external.L} × {config.masterpack.external.W}</span>
+              </div>
+              <div className="orientation">
+                <span>Layer 2: {config.masterpack.external.W} × {config.masterpack.external.L}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+      
+      {/* Section 3: Single Box Optimizer */}
+      <section className="box-optimizer">
+        <h2>🎯 Find Optimal Box Size</h2>
+        <div className="optimizer-controls">
+          <div className="optimization-summary">
+            <p>Find <strong>ONE</strong> box size that fits all {skus.length} products while enabling pallet interlocking within {targetPalletHeight}" height limit.</p>
+          </div>
           <button 
-            className={view === 'current' ? 'tab active' : 'tab'}
-            onClick={() => setView('current')}
+            className="optimize-btn-primary"
+            onClick={handleFindOptimalBox}
+            disabled={optimizing || !config}
           >
-            Current Masterpack ({config?.masterpack?.external?.L || 20}×{config?.masterpack?.external?.W || 15.5}×{config?.masterpack?.external?.H || 14})
-          </button>
-          <button 
-            className={view === 'optimal' ? 'tab active' : 'tab'}
-            onClick={() => setView('optimal')}
-            disabled={!optimalResults}
-          >
-            Optimal Masterpack {optimalResults && `(${optimalResults.optimal.dims.L}×${optimalResults.optimal.dims.W}×${optimalResults.optimal.dims.H})`}
+            {optimizing ? '🔄 Finding Optimal Box...' : '🚀 Find Optimal Box'}
           </button>
         </div>
         
-        {view === 'current' && currentAnalysis && (
-          <div className="analysis-section">
-            <div className="summary-card">
-              <h2>Current Masterpack Analysis</h2>
-              <div className="summary-stats">
-                <div className="stat-box">
-                  <div className="stat-label">Total SKUs</div>
-                  <div className="stat-value">{currentAnalysis.summary.totalSkus}</div>
-                </div>
-                <div className="stat-box">
-                  <div className="stat-label">Avg Squish Factor</div>
-                  <div className="stat-value">{currentAnalysis.summary.avgSquishFactor.toFixed(2)}x</div>
-                </div>
-                <div className="stat-box">
-                  <div className="stat-label">Avg Box Utilization</div>
-                  <div className="stat-value">{(currentAnalysis.summary.avgBoxUtilization * 100).toFixed(1)}%</div>
-                </div>
-                <div className="stat-box">
-                  <div className="stat-label">Avg Actual Util</div>
-                  <div className="stat-value">{(currentAnalysis.summary.avgActualUtil * 100).toFixed(1)}%</div>
-                </div>
-                <div className="stat-box">
-                  <div className="stat-label">Problematic SKUs</div>
-                  <div className="stat-value">{currentAnalysis.summary.problematicSkus}</div>
-                </div>
-                <div className="stat-box">
-                  <div className="stat-label">Underutilized (&lt;75%)</div>
-                  <div className="stat-value">{currentAnalysis.summary.underutilizedSkus}</div>
-                </div>
+        {optimalResults && (
+          <div className="optimal-result">
+            <div className="result-header">
+              <h3>✅ Recommended Box Size</h3>
+              <div className="recommended-box">
+                <span className="box-dims">
+                  {optimalResults.optimal.dims.L} × {optimalResults.optimal.dims.W} × {optimalResults.optimal.dims.H} inches
+                </span>
               </div>
             </div>
             
-            <div className="sku-table">
-              <h3>SKU Details</h3>
-              <table>
-                <thead>
-                  <tr>
-                    <th>SKU</th>
-                    <th>Dimensions</th>
-                    <th>Current Box</th>
-                    <th>Theoretical</th>
-                    <th>Actual</th>
-                    <th>Squish</th>
-                    <th>Box Util</th>
-                    <th>Util (Actual)</th>
-                    <th>Rotation</th>
-                    <th>Weight</th>
-                    <th>Notes</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {currentAnalysis.results.map(result => (
-                    <tr key={result.sku} className={result.squishFactor > 1.2 || result.squishFactor < 0.8 ? 'problematic' : ''}>
-                      <td className="sku-name">{result.sku}</td>
-                      <td>{result.dims.L}×{result.dims.W}×{result.dims.H}</td>
-                      <td>{result.currentBoxDims ? `${result.currentBoxDims.L}×${result.currentBoxDims.W}×${result.currentBoxDims.H}` : 'N/A'}</td>
-                      <td>{result.theoretical}</td>
-                      <td><strong>{result.actual}</strong></td>
-                      <td className={result.squishFactor > 1.2 ? 'high-squish' : result.squishFactor < 0.8 ? 'low-squish' : ''}>
-                        {result.squishFactor.toFixed(2)}x
-                      </td>
-                      <td className={(result.boxUtilization || 0) < 0.75 ? 'low-utilization' : ''}>
-                        {((result.boxUtilization || 0) * 100).toFixed(1)}%
-                      </td>
-                      <td>{(result.actualUtil * 100).toFixed(1)}%</td>
-                      <td>{result.rotation}</td>
-                      <td>{result.weight.toFixed(1)} lb</td>
-                      <td className="notes">{result.notes}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+            <div className="result-metrics">
+              <div className="metric">
+                <span className="metric-label">Average Utilization:</span>
+                <span className="metric-value">{(optimalResults.optimal.avgUtilization * 100).toFixed(1)}%</span>
+              </div>
+              <div className="metric">
+                <span className="metric-label">Pallet Coverage:</span>
+                <span className="metric-value">{(optimalResults.optimal.palletFit.avgCoverage * 100).toFixed(1)}%</span>
+              </div>
+              <div className="metric">
+                <span className="metric-label">Interlocking:</span>
+                <span className="metric-value success">
+                  {optimalResults.optimal.palletFit.canInterlock ? '✅ Yes' : '❌ No'}
+                </span>
+              </div>
+              <div className="metric">
+                <span className="metric-label">Layers per Pallet:</span>
+                <span className="metric-value">{Math.floor(targetPalletHeight / optimalResults.optimal.dims.H)}</span>
+              </div>
             </div>
             
-            {/* Optimization Opportunities Section */}
-            <div className="optimization-section">
-              <h3>Box Optimization Opportunities</h3>
-              <div className="optimization-grid">
-                {currentAnalysis.results
-                  .filter(result => (result.boxUtilization || 0) < 0.75)
-                  .slice(0, 6)
-                  .map(result => (
-                    <div key={result.sku} className="optimization-card">
-                      <h4>{result.sku}</h4>
-                      <div className="optimization-metrics">
-                        <div className="metric">
-                          <span className="metric-label">Current Box Util:</span>
-                          <span className="metric-value low">{((result.boxUtilization || 0) * 100).toFixed(1)}%</span>
-                        </div>
-                        <div className="metric">
-                          <span className="metric-label">Items per Box:</span>
-                          <span className="metric-value">{result.actual}</span>
-                        </div>
-                        <div className="metric">
-                          <span className="metric-label">Squish Factor:</span>
-                          <span className="metric-value">{result.squishFactor.toFixed(2)}x</span>
-                        </div>
-                        <div className="metric">
-                          <span className="metric-label">Current Box:</span>
-                          <span className="metric-value">{result.currentBoxDims ? `${result.currentBoxDims.L}×${result.currentBoxDims.W}×${result.currentBoxDims.H}` : 'N/A'}</span>
-                        </div>
-                      </div>
-                      <div className="optimization-note">
-                        <strong>Recommendation:</strong> Consider smaller box size or different orientation
-                      </div>
-                    </div>
-                  ))}
-              </div>
-              {currentAnalysis.results.filter(result => (result.boxUtilization || 0) < 0.75).length === 0 && (
-                <div className="no-optimizations">
-                  <p>✓ All kits have good box utilization (≥75%)</p>
+            <div className="pallet-layout">
+              <h4>📐 Pallet Layout</h4>
+              <div className="layout-info">
+                <div className="layer-info">
+                  <strong>Layer 1:</strong> {optimalResults.optimal.palletFit.layer1Count} boxes 
+                  ({(optimalResults.optimal.palletFit.layer1Coverage * 100).toFixed(1)}% coverage)
                 </div>
-              )}
+                <div className="layer-info">
+                  <strong>Layer 2:</strong> {optimalResults.optimal.palletFit.layer2Count} boxes 
+                  ({(optimalResults.optimal.palletFit.layer2Coverage * 100).toFixed(1)}% coverage)
+                </div>
+                <div className="total-info">
+                  <strong>Total per Pallet:</strong> {Math.floor(targetPalletHeight / optimalResults.optimal.dims.H) * 
+                    Math.max(optimalResults.optimal.palletFit.layer1Count, optimalResults.optimal.palletFit.layer2Count)} boxes
+                </div>
+              </div>
             </div>
           </div>
         )}
-        
-        {view === 'optimal' && optimalResults && (
-          <div className="analysis-section">
-            <div className="summary-card optimal">
-              <h2>Optimal Masterpack: {optimalResults.optimal.dims.L}×{optimalResults.optimal.dims.W}×{optimalResults.optimal.dims.H} in</h2>
-              <div className="summary-stats">
-                <div className="stat-box">
-                  <div className="stat-label">Avg Utilization</div>
-                  <div className="stat-value">{(optimalResults.optimal.avgUtilization * 100).toFixed(1)}%</div>
+      </section>
+      
+      {/* Section 4: Product Validation */}
+      {optimalResults && (
+        <section className="product-validation">
+          <h2>✅ Product Fit Validation</h2>
+          <p>How each product fits in the recommended box:</p>
+          <div className="validation-grid">
+            {optimalResults.optimal.skuResults.map(result => (
+              <div key={result.sku} className={`validation-card ${!result.fits ? 'invalid' : ''}`}>
+                <div className="validation-header">
+                  <span className="sku-name">{result.sku}</span>
+                  <span className={`fit-status ${result.fits ? 'fits' : 'no-fit'}`}>
+                    {result.fits ? '✅ Fits' : '❌ No Fit'}
+                  </span>
                 </div>
-                <div className="stat-box">
-                  <div className="stat-label">Volume</div>
-                  <div className="stat-value">{optimalResults.optimal.totalVolume.toFixed(0)} in³</div>
-                </div>
-                <div className="stat-box">
-                  <div className="stat-label">vs Baseline</div>
-                  <div className="stat-value">{(optimalResults.optimal.avgBaselineRatio * 100).toFixed(0)}%</div>
-                </div>
-                <div className="stat-box">
-                  <div className="stat-label">Pallet Coverage</div>
-                  <div className="stat-value">{(optimalResults.optimal.palletFit.avgCoverage * 100).toFixed(1)}%</div>
-                </div>
-                <div className="stat-box">
-                  <div className="stat-label">Interlocking</div>
-                  <div className="stat-value">{optimalResults.optimal.palletFit.canInterlock ? '✓ Yes' : '✗ No'}</div>
-                </div>
-              </div>
-              
-              {optimalResults.optimal.palletFit.canInterlock && (
-                <div className="pallet-pattern">
-                  <h3>Interlocking Pattern</h3>
-                  <div className="pattern-details">
-                    <div>Layer 1: {optimalResults.optimal.palletFit.layer1Count} cases ({(optimalResults.optimal.palletFit.layer1Coverage * 100).toFixed(1)}% coverage)</div>
-                    <div>Layer 2: {optimalResults.optimal.palletFit.layer2Count} cases ({(optimalResults.optimal.palletFit.layer2Coverage * 100).toFixed(1)}% coverage)</div>
-                    <div>Pattern: Alternating 90° rotation per layer for stability</div>
+                <div className="validation-details">
+                  <div className="detail">
+                    <span>Quantity:</span>
+                    <span>{result.count} units</span>
+                  </div>
+                  <div className="detail">
+                    <span>Utilization:</span>
+                    <span>{(result.utilization * 100).toFixed(1)}%</span>
+                  </div>
+                  <div className="detail">
+                    <span>vs Current:</span>
+                    <span className={result.count >= result.currentBaseline ? 'better' : 'worse'}>
+                      {result.currentBaseline > 0 ? `${Math.round((result.count / result.currentBaseline) * 100)}%` : 'N/A'}
+                    </span>
                   </div>
                 </div>
-              )}
-            </div>
-            
-            <div className="sku-table">
-              <h3>SKU Performance in Optimal Box</h3>
-              <table>
-                <thead>
-                  <tr>
-                    <th>SKU</th>
-                    <th>Fits</th>
-                    <th>Count</th>
-                    <th>Utilization</th>
-                    <th>vs Current</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {optimalResults.optimal.skuResults.map(result => (
-                    <tr key={result.sku}>
-                      <td className="sku-name">{result.sku}</td>
-                      <td>{result.fits ? '✓' : '✗'}</td>
-                      <td><strong>{result.count}</strong></td>
-                      <td>{(result.utilization * 100).toFixed(1)}%</td>
-                      <td className={result.count >= result.currentBaseline ? 'better' : 'worse'}>
-                        {result.currentBaseline > 0 ? `${((result.count / result.currentBaseline) * 100).toFixed(0)}%` : 'N/A'}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-            
-            <div className="top-candidates">
-              <h3>Other Top Candidates</h3>
-              <div className="candidates-grid">
-                {optimalResults.topCandidates.slice(1, 5).map((candidate, idx) => (
-                  <div key={idx} className="candidate-card">
-                    <h4>{candidate.dims.L}×{candidate.dims.W}×{candidate.dims.H} in</h4>
-                    <div>Util: {(candidate.avgUtilization * 100).toFixed(1)}%</div>
-                    <div>Vol: {candidate.totalVolume.toFixed(0)} in³</div>
-                    <div>Coverage: {(candidate.palletFit.avgCoverage * 100).toFixed(1)}%</div>
-                  </div>
-                ))}
               </div>
-            </div>
+            ))}
           </div>
-        )}
-        
-        {!currentAnalysis && !optimizing && (
-          <div className="empty-state">
-            <p>Loading SKU data...</p>
-          </div>
-        )}
-      </main>
+        </section>
+      )}
     </div>
   )
 }
